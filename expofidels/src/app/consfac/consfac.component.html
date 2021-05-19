@@ -1,0 +1,69 @@
+
+<div class="menu mb-3" >
+    <mat-form-field appearance="fill">
+      <mat-label>Refer:</mat-label>
+      <mat-select>
+        <mat-option [value]="aft.comproba"
+                    (click)="sliceNameFactF(aft.comproba)"
+                    [title]="aft.nomCliente"
+                    *ngFor=" let aft of arrFactsType">
+         {{aft.comproba}} / {{aft.nomCliente}}   
+        </mat-option>    
+      </mat-select>
+      <mat-hint align="end">Escoje un tipo de factura por código.</mat-hint>
+    </mat-form-field>
+    <mat-form-field class="example-full-width">
+      <mat-label>Tipo:</mat-label>
+      <input matInput placeholder="FA" [(ngModel)]="_typ" (keyup.enter)="getFacts(a,b,c,d)" >
+    </mat-form-field>
+   
+<mat-form-field class="example-full-width">
+    <mat-label>Ingrese N°. Factura:</mat-label>
+    <input matInput placeholder="0000123456" type="search" [(ngModel)]="_options" (keyup.enter)="getFacts(a,b,c,d)" >
+  </mat-form-field>
+
+
+  <mat-form-field class="example-full-width">
+    <mat-label>Ingrese N°. Bodega:</mat-label>
+    <input matInput placeholder="001" disabled [(ngModel)]="_bodega" >
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width">
+    <mat-label>Cliente:</mat-label>
+    <input matInput placeholder="cliente..." disbled >
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>fecha:</mat-label>
+    <input matInput [matDatepicker]="picker" [(ngModel)]="_dateNow" >
+    <mat-datepicker-toggle matSuffix [for]="picker">
+      <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+    </mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+</div>
+
+<div class="tableinfo">
+
+    <table class="table table-striped table hover">
+        <thead class="table-dark">
+            <tr>
+              <th scope="col">Código</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Escaneo</th>
+              <th scope="col">Diferencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor=" let af of arrFacts" >
+              <th scope="row"> {{af.no_parte}} </th>
+              <td>{{af.nomParte}}</td>
+              <td>{{af.cantidad}}</td>
+              <td>----</td>
+              <td>----</td>
+            </tr>
+        </tbody>
+      </table>
+
+</div>

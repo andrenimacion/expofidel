@@ -1,0 +1,31 @@
+<section class="header" [ngStyle]="{'height': height + 'px'}" >
+
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
+        <mat-icon>chevron_right</mat-icon>
+    </button>
+
+    <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Menú de acciónes</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <div class="head">
+        <mat-tab-group mat-align-tabs="end">
+            <mat-tab label="Control de productos">
+                <div class="dashApps container-fluid" [ngStyle]="{'height': heightApps + 'px'}" >
+                    <app-consfac></app-consfac>
+                </div>  
+            </mat-tab>
+            <mat-tab class="icon-qr-code" label="Scanner QR">
+                <app-qrscann></app-qrscann>
+            </mat-tab>
+            <!-- <mat-tab label="Programa 3">  Content 3 </mat-tab> -->
+        </mat-tab-group>
+    </div>
+
+</section>
+<!-- 
+<span class="note"> Aplicación Web - syscompsa 2021 - versión beta 0.0.0.1 | Desarrollo </span> -->
+

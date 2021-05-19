@@ -1,0 +1,99 @@
+.dpix {
+    /* border: solid 1px gray; */
+    width: 300px;
+}
+
+.congen {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    position: absolute;
+}
+
+.contsQR
+    display flex
+    justify-content center
+   
+.scan
+    width 300px
+    height 290px
+
+.btnCamSetts {
+    display: flex;
+    justify-content: stretch;
+}
+
+.camCh:hover {
+    transition: ease all 0.5s;
+    background-color: rgb(230, 198, 17);
+    color: black;
+}
+
+.camCh {
+    transition: ease all 0.5s;
+    cursor: pointer;
+    padding: 10px;
+    background: #444;
+    color: white;
+}
+
+@media screen and (max-width: 600px) {
+    .dpix {
+        width: 100%;
+    }
+}
+
+.title {
+    display: flex;
+    justify-content: stretch;
+    align-items: center;
+}
+
+.cdk-overlay-connected-position-bounding-box {
+    position: absolute !important;
+}
+
+.mat-icon-button {
+    border-radius: 0px !important;
+}
+
+.rec {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+
+/* #region animaciones */
+
+@keyframes animEntrada {
+    0% {
+        opacity: 0;
+        transform: translateX(0px);
+    }
+    10% {
+        transform: translateX(-15px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(150px);
+    }
+}
+
+@keyframes animSalida {
+    0% {
+        opacity: 1;
+        transform: translateX(150px);
+    }
+    10% {
+        opacity: 1;
+        transform: translateX(165x);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(0px);
+    }
+}
