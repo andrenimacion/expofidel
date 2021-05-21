@@ -4,7 +4,7 @@
       <mat-label>Refer:</mat-label>
       <mat-select>
         <mat-option [value]="aft.comproba"
-                    (click)="sliceNameFactF(aft.comproba)"
+                    (click)="sliceNameFactF(aft.comproba, aft.nomCliente)"
                     [title]="aft.nomCliente"
                     *ngFor=" let aft of arrFactsType">
          {{aft.comproba}} / {{aft.nomCliente}}   
@@ -14,23 +14,27 @@
     </mat-form-field>
     <mat-form-field class="example-full-width">
       <mat-label>Tipo:</mat-label>
-      <input matInput placeholder="FA" [(ngModel)]="_typ" (keyup.enter)="getFacts(a,b,c,d)" >
+      <input matInput placeholder="FA" [(ngModel)]="_typ" >
     </mat-form-field>
    
-<mat-form-field class="example-full-width">
+  <mat-form-field class="example-full-width">
     <mat-label>Ingrese N°. Factura:</mat-label>
-    <input matInput placeholder="0000123456" type="search" [(ngModel)]="_options" (keyup.enter)="getFacts(a,b,c,d)" >
+    <!-- (keyup.enter)="getFacts(a,b,c,d)"  -->
+    <input matInput placeholder="0000123456" type="search" [(ngModel)]="_options">
   </mat-form-field>
 
-
   <mat-form-field class="example-full-width">
-    <mat-label>Ingrese N°. Bodega:</mat-label>
+    
+    <mat-label>
+          Ingrese N°. Bodega:
+    </mat-label>
     <input matInput placeholder="001" disabled [(ngModel)]="_bodega" >
+
   </mat-form-field>
 
   <mat-form-field class="example-full-width">
     <mat-label>Cliente:</mat-label>
-    <input matInput placeholder="cliente..." disbled >
+    <input matInput disabled placeholder="cliente..."  [(ngModel)]="_name" >
   </mat-form-field>
 
   <mat-form-field class="example-full-width" appearance="fill">
@@ -44,7 +48,9 @@
 </div>
 
 <div class="tableinfo">
-
+    <button class="btn btn-secondary" (click)="deleteBD('register-scann', 'register-scanns')" >
+      Borrar base de datos.
+    </button>
     <table class="table table-striped table hover">
         <thead class="table-dark">
             <tr>
@@ -60,8 +66,8 @@
               <th scope="row"> {{af.no_parte}} </th>
               <td>{{af.nomParte}}</td>
               <td>{{af.cantidad}}</td>
-              <td>----</td>
-              <td>----</td>
+              <td>{{scaningQR}}</td>
+              <td>{{total}}</td>
             </tr>
         </tbody>
       </table>

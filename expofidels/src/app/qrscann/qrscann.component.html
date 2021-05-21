@@ -2,7 +2,7 @@
 
 <div class="contsQR animated fadeIn fast">
     <div class="contapp">
-    <div class="btnCamSetts">
+    <div class="btnCamSetts" >
 
         <div class="rec btn btn-warning" (click)="reiniciarQR()">
             <mat-icon> published_with_changes </mat-icon>Recargar Lector-QR
@@ -13,10 +13,16 @@
         </div>
 
     </div>
+
     <div class="scan">
         <qr-scanner [debug]="false" [canvasWidth]="300" [canvasHeight]="280" [stopAfterScan]="true" [updateTime]="500">
         </qr-scanner>
     </div>
+        
+    <div class="prds" (click)="cont()" style="cursor: pointer;">
+        Descripción de producto: <br> {{codPRODS}}
+     </div>
+
 </div>
     
 
