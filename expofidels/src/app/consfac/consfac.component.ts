@@ -1,5 +1,6 @@
 import { Component, OnInit, SimpleChanges } from '@angular/core';
 import { ControlprodService } from '../services/controlprod.service';
+import { IndexedDBService } from '../services/indexed-db.service';
 
 @Component({
   selector: 'app-consfac',
@@ -21,37 +22,59 @@ export class ConsfacComponent implements OnInit {
   public total: any;
   public db;
 
-  constructor( public dataFact: ControlprodService ) { }
+  //#region persistencia de datos para la tabla  
+  public codigo;
+  public nombre;
+  public cantidad;
+  public escaneo;
+  public diferencia;  
+  //#endregion 
+
+  constructor( public dataFact: ControlprodService, public iDB: IndexedDBService ) { }
 
   ngOnInit() {
     this.getFacts('_opt_', 'FA', '00000599', 'V');
     this.getFactType('0', '50');
     this.datesNow();
-    this.dbREAD('register-scann');
+    this.dbREAD('scanDB');
+    this.scaningQR = Number(localStorage.getItem('scann_number'));  
+
+    this.nombre      =    localStorage.getItem('p_nombre');
+    this.codigo      =    localStorage.getItem('p_codigo');
+    this.cantidad    =    localStorage.getItem('p_cantidad');
+    this.escaneo     =    localStorage.getItem('p_escaneo');
+    this.diferencia  =    localStorage.getItem('p_diferen');
+
     //localStorage.removeItem('cp');
-    //this.deleteBD('register-scann', 'register-scann')
+    //this.deleteBD('register-scann', 'register-scann');
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
-    //Add '${implements OnChanges}' to the class.
-    
-    this.scaningQR = Number(localStorage.getItem('cp'));
- 
-  
+    //Add '${implements OnChanges}' to the class.    
+  }
+
+  persData(nom, cod, cant, esc, dif) {
+
+    localStorage.setItem('p_nombre',   nom);
+    localStorage.setItem('p_codigo',   cod);
+    localStorage.setItem('p_cantidad', cant);
+    localStorage.setItem('p_escaneo',  esc);
+    localStorage.setItem('p_diferen',  dif);
+
   }
 
   sliceNameFactF = (a, b) => {
-
-    this.sliceNameFact = a.slice(0,2)
+  
+    this.sliceNameFact = a.slice(0,2);
     this._typ = this.sliceNameFact;
-    this.sliceNameFactB = a.slice(2,10)
+    this.sliceNameFactB = a.slice(2,10);
     this._options = this.sliceNameFactB;
-    //console.log( this._typ );
     this._name = b;
     this.getFacts( '_opt_', this.sliceNameFact, this.sliceNameFactB, 'V' );
-
-  };
+  
+  }
 
   datesNow() {  
 
@@ -63,6 +86,8 @@ export class ConsfacComponent implements OnInit {
     // console.log(this._dateNow); 
     
   }
+
+
 
   public arrCursor: any = [];
   dbREAD(bd) {
@@ -81,12 +106,14 @@ export class ConsfacComponent implements OnInit {
       
       objectStore.openCursor().onsuccess = (e) => {
 
-      const cursor = e.target.result;
-        if( cursor ) {          
+      const cursor = e.target.result; 
+        if( cursor ) {
+        
           this.arrCursor.push(cursor.value);
           cursor.continue();
           this.scaningQR = this.arrCursor.length;
-          localStorage.setItem('scann_number', this.scaningQR.toString());        
+          localStorage.setItem('scann_number', this.scaningQR.toString());
+        
         }
 
       }
@@ -95,7 +122,7 @@ export class ConsfacComponent implements OnInit {
 
     request.onupgradeneeded = () => {      
       db = request.result;
-      const objectStore = db.createObjectStore(bd, {
+      db.createObjectStore(bd, {
         autoIncrement: true
       });      
     }
@@ -103,35 +130,49 @@ export class ConsfacComponent implements OnInit {
   }
 
 
-  makeTX(storeName, mode) {
-    let tx = this.db.transaction(storeName, mode);
-    tx.onerror = (err) => {
-      console.warn(err);
-    };
-    return tx;
-  }
-
-  clearForm(ev) {
-    if (ev) ev.preventDefault();
-    // document.whiskeyForm.reset();
-  }
-
-  getFacts(a,b,c,d) {
+   getFacts(a,b,c,d) {
     
     this.dataFact.getfactura(a,b,c,d).subscribe( FACTS => {
       this.arrFacts = FACTS;
-
+      console.log(this.arrFacts);
       for( let k = 0; k <= this.arrFactsType.length; k++ ) {
         
            this._bodega = this.arrFacts[k].bodega;
            localStorage.setItem('bodega',   this.arrFacts[k].bodega);
            localStorage.setItem('cantidad', this.arrFacts[k].cantidad);
            localStorage.setItem('no_parte', this.arrFacts[k].no_parte);
+           this.total = this.arrFacts[k].cantidad - Number(localStorage.getItem('scann_number'));
+           localStorage.setItem('total', this.total);
 
-      }
+          if( localStorage.getItem('no_parte') != localStorage.getItem('cod_prod') ) {
+            
+            this.iDB.elBDData('scanDB');
+            localStorage.removeItem('total');
+            localStorage.removeItem('scann_number');
+            localStorage.setItem('total', '0');
+            localStorage.setItem('scann_number', '0');
+            console.log('Esto es diferente');
 
-    }, err => {
-       console.log('No encontro la informacion');
+          }
+
+          else {
+
+            this.persData(this.arrFacts[k].nomParte,
+                          this.arrFacts[k].no_parte,
+                          this.arrFacts[k].cantidad,
+                          localStorage.getItem('scann_number'),
+                          this.arrFacts[k].cantidad - Number(localStorage.getItem('scann_number')));
+
+            console.log('Esto es igual');
+
+          }
+
+        }
+
+    }, (err) => {
+
+      // console.log('No encontro la informacion' + err);
+    
     })
   }
 

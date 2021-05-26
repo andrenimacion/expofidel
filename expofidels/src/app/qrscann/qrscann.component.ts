@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { QrScannerComponent } from 'angular2-qrscanner';
+import { IndexedDBService } from '../services/indexed-db.service';
 
 @Component({
   selector: 'app-qrscann',
@@ -24,26 +25,26 @@ export class QrscannComponent implements OnInit {
   public pIngresado = false;
   public scannerQR  = false;
   public difer: any;
-
-  @ViewChild(QrScannerComponent, { static : false }) qrScannerComponent: QrScannerComponent ;
-
-
-  constructor() {
-  }
   public Numpost;
-  ngOnInit() {
-    // localStorage.removeItem('cp')
 
+  @ViewChild(QrScannerComponent, { static : false }) qrScannerComponent: QrScannerComponent;
+
+  constructor( public iDB: IndexedDBService ) { }
+  
+  ngOnInit() {
+    // localStorage.removeItem('cp');
   }
 
   ngAfterViewInit(): void {
-    //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
-    //Add 'implements AfterViewInit' to the class.
+
+    // Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
+    // Add 'implements AfterViewInit' to the class.
     this.cameraControl(this.camera);
+
   }
   
-
   cameraControl(a) {
+
     this.qrScannerComponent.getMediaDevices().then(devices => {
       //console.log(devices);
       const videoDevices: MediaDeviceInfo[] = [];
@@ -87,6 +88,7 @@ export class QrscannComponent implements OnInit {
           }
 
       }
+
   });
 
   this.qrScannerComponent.capturedQr.subscribe( result => {
@@ -94,7 +96,8 @@ export class QrscannComponent implements OnInit {
       var regex = /(\d+)/g;
       document.getElementsByTagName('video')[0].style.display = 'none';
       this.codPRODS = result;
-
+      
+      
       let sliceResult = this.codPRODS.slice(5,20);
       this.sliceNum = sliceResult.match(regex);
       localStorage.setItem('cod_prod', this.sliceNum.toString());
@@ -103,12 +106,18 @@ export class QrscannComponent implements OnInit {
         num: this.sliceNum.toString()
       }
       
-      this.dbFun(this.arrNum);
+      this.iDB.createIndexedDB('scanDB', 1);
+      this.iDB.saveDataIndexedDB('scanDB', 1, this.arrNum);
       
-      if (this.sliceNum.toString() != localStorage.getItem('no_parte')) {        
-        console.log('[CODIGO] Es diferente: ' +
+      if (this.sliceNum.toString() != localStorage.getItem('no_parte'))  {        
+        
+        this.iDB.elBDData('scanDB');
+        console.log('[CODIGO] Es diferente: ' + 
                      this.sliceNum.toString() + ' ' +
                      localStorage.getItem('no_parte'));
+                     localStorage.removeItem('scann_number');
+                     localStorage.setItem('scann_number', '0');
+                     this.reiniciarQR();
       }
       
       else {
@@ -116,7 +125,7 @@ export class QrscannComponent implements OnInit {
                     this.sliceNum.toString() + ' ' +
                     localStorage.getItem('cod_prod'));
       }
-      
+
     });
 
   }
@@ -125,31 +134,6 @@ export class QrscannComponent implements OnInit {
     window.location.reload();
   }
 
-  public arrCursor:any = [];
-  dbFun(data) {
-
-    var db;
-
-    const request = indexedDB.open('register-scann', 1);    
-
-    request.onerror = (error) => console.log(error)
-    request.onsuccess = (e) => {
-
-    db = request.result;
-      const transaction =  db.transaction(['register-scann'], 'readwrite');
-      const objectStore =  transaction.objectStore('register-scann');
-      let r = objectStore.add(data);
-    }
-
-    request.onupgradeneeded = () =>{  
-      db = request.result;
-      const objectStore = db.createObjectStore('register-scann', {
-        autoIncrement: true,
-        // keyPath: 'con'
-      });
-    }
-    
-  }
   
   changeCamera() {
 

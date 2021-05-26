@@ -8,9 +8,11 @@
                     [title]="aft.nomCliente"
                     *ngFor=" let aft of arrFactsType">
          {{aft.comproba}} / {{aft.nomCliente}}   
-        </mat-option>    
+        </mat-option>
       </mat-select>
-      <mat-hint align="end">Escoje un tipo de factura por código.</mat-hint>
+      <mat-hint align="end">
+          Escoje un tipo de factura por código.
+      </mat-hint>
     </mat-form-field>
     <mat-form-field class="example-full-width">
       <mat-label>Tipo:</mat-label>
@@ -48,9 +50,10 @@
 </div>
 
 <div class="tableinfo">
-    <button class="btn btn-secondary" (click)="deleteBD('register-scann', 'register-scanns')" >
+    <!-- <button class="btn btn-secondary" (click)="deleteBD('register-scann', 'register-scanns')" >
       Borrar base de datos.
-    </button>
+    </button> -->
+    
     <table class="table table-striped table hover">
         <thead class="table-dark">
             <tr>
