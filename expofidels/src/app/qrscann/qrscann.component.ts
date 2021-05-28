@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { QrScannerComponent } from 'angular2-qrscanner';
 import { IndexedDBService } from '../services/indexed-db.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-qrscann',
@@ -97,7 +98,8 @@ export class QrscannComponent implements OnInit {
       document.getElementsByTagName('video')[0].style.display = 'none';
       this.codPRODS = result;
       
-      
+      console.log(result);
+
       let sliceResult = this.codPRODS.slice(5,20);
       this.sliceNum = sliceResult.match(regex);
       localStorage.setItem('cod_prod', this.sliceNum.toString());
@@ -115,15 +117,43 @@ export class QrscannComponent implements OnInit {
         console.log('[CODIGO] Es diferente: ' + 
                      this.sliceNum.toString() + ' ' +
                      localStorage.getItem('no_parte'));
-                     localStorage.removeItem('scann_number');
-                     localStorage.setItem('scann_number', '0');
-                     this.reiniciarQR();
+        
+        Swal.fire({
+         
+         title: 'Are you sure?',
+         text: "You won't be able to revert this!",
+         icon: 'warning',
+         showCancelButton: true,
+         confirmButtonColor: '#3085d6',
+         cancelButtonColor: '#d33',
+         confirmButtonText: 'Si, reiniciar!'
+
+        }).then((result) => {
+
+          localStorage.removeItem('scann_number');
+          localStorage.setItem('scann_number', '0');
+          this.reiniciarQR();
+
+          if (result.isConfirmed) {
+            Swal.fire(
+              'Reseteado!',
+              'Valor de scaneo reiniciado.',
+              'success'
+            )
+          }
+          
+        })
+            
+            
       }
       
       else {
         console.log('[CODIGO] Es igual: ' +
                     this.sliceNum.toString() + ' ' +
                     localStorage.getItem('cod_prod'));
+                   
+        //this.reiniciarQR();
+        
       }
 
     });

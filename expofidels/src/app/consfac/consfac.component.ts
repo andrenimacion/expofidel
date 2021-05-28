@@ -1,6 +1,7 @@
 import { Component, OnInit, SimpleChanges } from '@angular/core';
 import { ControlprodService } from '../services/controlprod.service';
 import { IndexedDBService } from '../services/indexed-db.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-consfac',
@@ -8,6 +9,8 @@ import { IndexedDBService } from '../services/indexed-db.service';
   styleUrls: ['./consfac.component.styl']
 })
 export class ConsfacComponent implements OnInit {
+
+  public _searchFacts: string;
 
   public arrFacts: any = [];
   public arrFactsType: any = [];
@@ -45,8 +48,6 @@ export class ConsfacComponent implements OnInit {
     this.escaneo     =    localStorage.getItem('p_escaneo');
     this.diferencia  =    localStorage.getItem('p_diferen');
 
-    //localStorage.removeItem('cp');
-    //this.deleteBD('register-scann', 'register-scann');
 
   }
 
@@ -83,8 +84,7 @@ export class ConsfacComponent implements OnInit {
     let day = fecha.getDay();
     let month = fecha.getMonth();
     return this._dateNow = `${month}/${day}/${year}`;
-    // console.log(this._dateNow); 
-    
+ 
   }
 
 
@@ -130,6 +130,23 @@ export class ConsfacComponent implements OnInit {
   }
 
 
+  getFactsUnit( type, top ) {
+    this.dataFact.getfacttype(type, top).subscribe( typef => {
+      this.arrFactsType = typef;
+    }, (err)=> {
+      console.log(err);
+      Swal.fire({
+        title: 'No se pudo concretar tu busqueda',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      })
+    })
+  }
+
    getFacts(a,b,c,d) {
     
     this.dataFact.getfactura(a,b,c,d).subscribe( FACTS => {
@@ -143,6 +160,25 @@ export class ConsfacComponent implements OnInit {
            localStorage.setItem('no_parte', this.arrFacts[k].no_parte);
            this.total = this.arrFacts[k].cantidad - Number(localStorage.getItem('scann_number'));
            localStorage.setItem('total', this.total);
+           
+          //#region carga de información por medio del servicio
+
+          /*1*/ this.persData(this.arrFacts[k].nomParte,
+          /*2*/ this.arrFacts[k].no_parte,
+          /*3*/ this.arrFacts[k].cantidad,
+          /*4*/ localStorage.getItem('scann_number'),
+          /*5*/ this.arrFacts[k].cantidad - Number(localStorage.getItem('scann_number')));
+            
+            //#region cambiando el storage
+            this.nombre      =    localStorage.getItem('p_nombre');
+            this.codigo      =    localStorage.getItem('p_codigo');
+            this.cantidad    =    localStorage.getItem('p_cantidad');
+            this.escaneo     =    localStorage.getItem('p_escaneo');
+            this.diferencia  =    localStorage.getItem('p_diferen');
+            //#endregion
+           
+          //#region
+
 
           if( localStorage.getItem('no_parte') != localStorage.getItem('cod_prod') ) {
             
@@ -152,6 +188,16 @@ export class ConsfacComponent implements OnInit {
             localStorage.setItem('total', '0');
             localStorage.setItem('scann_number', '0');
             console.log('Esto es diferente');
+
+            Swal.fire({
+              title: 'Se reiniciará los scaneos ya que el código seleccionado es diferente',
+              showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+              },
+              hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+              }
+            })
 
           }
 
@@ -163,7 +209,7 @@ export class ConsfacComponent implements OnInit {
                           localStorage.getItem('scann_number'),
                           this.arrFacts[k].cantidad - Number(localStorage.getItem('scann_number')));
 
-            console.log('Esto es igual');
+                          console.log('Esto es igual');
 
           }
 
