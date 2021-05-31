@@ -58,6 +58,9 @@ import { QrscannComponent } from './qrscann/qrscann.component';
 //#endregion
 
 import { NgQrScannerModule } from 'angular2-qrscanner';
+import { EmailcontrollerComponent } from './emailcontroller/emailcontroller.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -65,6 +68,7 @@ import { NgQrScannerModule } from 'angular2-qrscanner';
     DashboardComponent,
     ConsfacComponent,
     QrscannComponent,
+    EmailcontrollerComponent,
   ],
   imports: [
     NgQrScannerModule,
@@ -121,7 +125,8 @@ import { NgQrScannerModule } from 'angular2-qrscanner';
       { path: 'dash',   component: DashboardComponent     },
       { path: '**', pathMatch: 'full', redirectTo: 'dash' }
     ]),
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [],
   bootstrap: [AppComponent]

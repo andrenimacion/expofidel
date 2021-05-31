@@ -11,9 +11,9 @@ export class EmailcontrolService {
   constructor( private http: HttpClient ) { }
 
     //obtiens los tipos las facturas por parámetros
-    updtEmail  = (email) => this.http.get( this.urlapi + `api/webmail/UpdateMail/${email}`);
+    updtEmail  = (email) => this.http.get( this.urlapi + `webmail/UpdateMail/${email}`);
 
-    getEmail = () => this.http.get( this.urlapi + `api/webmail/SelectMail`);
+    getEmail = () => this.http.get( this.urlapi + `webmail/SelectMail`);
 
 
 }

@@ -135,7 +135,7 @@ export class QrscannComponent implements OnInit {
           this.reiniciarQR();
 
           if (result.isConfirmed) {
-            Swal.fire(
+            Swal.fire(              
               'Reseteado!',
               'Valor de scaneo reiniciado.',
               'success'
@@ -151,13 +151,9 @@ export class QrscannComponent implements OnInit {
         console.log('[CODIGO] Es igual: ' +
                     this.sliceNum.toString() + ' ' +
                     localStorage.getItem('cod_prod'));
-                   
-        //this.reiniciarQR();
-        
+                          
       }
-
     });
-
   }
 
   reiniciarQR() {

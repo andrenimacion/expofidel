@@ -1,0 +1,43 @@
+<mat-form-field class="example-chip-list">
+  <mat-label>Selección rápida de e-mails agregados recientemente:</mat-label>
+  <mat-chip-list #chipList aria-label="Fruit selection">
+    <mat-chip *ngFor="let fruit of fruits" [selectable]="selectable"
+             [removable]="removable" (removed)="remove(fruit)"  >
+      {{fruit.name}}
+      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+    </mat-chip>
+    <input placeholder="Nuevo email a utilizar con recurrencia"
+           [matChipInputFor]="chipList"
+           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+           [matChipInputAddOnBlur]="addOnBlur"
+           (matChipInputTokenEnd)="add($event)">
+  </mat-chip-list>
+</mat-form-field>
+
+<mat-form-field class="example-full-width">
+    <mat-label>Email destinatario:</mat-label>
+    <input matInput placeholder="...@mail.com" [(ngModel)]="_email" >
+  </mat-form-field>
+  
+<mat-form-field class="example-full-width">
+  <mat-label>C.C:</mat-label>
+  <input matInput placeholder="...@mail.com" [(ngModel)]="_copyemail">
+</mat-form-field>
+  <br>
+  <mat-form-field class="example-full-width">
+    <mat-label>Asunto</mat-label>
+    <textarea matInput placeholder="...asunto del mail..." [(ngModel)]="_asunto" ></textarea>
+  </mat-form-field>
+  <section class="example-section mb-3">
+    <mat-checkbox class="example-margin" [(ngModel)]="_data" (change)="getValueCheck(_data)"  >Adjuntar transacción!</mat-checkbox>
+    <!-- <mat-checkbox class="example-margin" [disabled]="true">Disabled</mat-checkbox> -->
+  </section>
+  <button mat-raised-button color="primary" (click)="sendMailRecover( _email, _copyemail, _asunto )">
+      <mat-icon>send</mat-icon>
+      Enviar email
+ </button>
+
+<div class="fechaAct mt-3"> 
+    <mat-icon>event</mat-icon>
+    <span class="note"> {{dateN}} </span>
+</div>

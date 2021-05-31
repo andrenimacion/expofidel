@@ -2,6 +2,9 @@ import { Component, OnInit, SimpleChanges } from '@angular/core';
 import { ControlprodService } from '../services/controlprod.service';
 import { IndexedDBService } from '../services/indexed-db.service';
 import Swal from 'sweetalert2';
+import { TInvcabgControllerService } from '../services/t-invcabg-controller.service';
+import { TokenGenerateService } from '../services/token-generate.service';
+import { EmailcontrolService } from '../services/emailcontrol.service';
 
 @Component({
   selector: 'app-consfac',
@@ -32,8 +35,13 @@ export class ConsfacComponent implements OnInit {
   public escaneo;
   public diferencia;  
   //#endregion 
+  public typeGen: string;
 
-  constructor( public dataFact: ControlprodService, public iDB: IndexedDBService ) { }
+  constructor( public dataFact: ControlprodService,
+               public iDB: IndexedDBService,
+               private desSave: TInvcabgControllerService,
+               public tGener: TokenGenerateService,
+               public emServGen:EmailcontrolService  ) { }
 
   ngOnInit() {
     this.getFacts('_opt_', 'FA', '00000599', 'V');
@@ -48,6 +56,18 @@ export class ConsfacComponent implements OnInit {
     this.escaneo     =    localStorage.getItem('p_escaneo');
     this.diferencia  =    localStorage.getItem('p_diferen');
 
+    this._bodega = localStorage.getItem('bodega');
+    this._typ = localStorage.getItem('tipo');
+    this._options = localStorage.getItem('factura_number');
+    this._name = localStorage.getItem('nomCliente');
+
+
+    this.emServGen.getEmail().subscribe( email => {
+      this.em = email;
+      this.typeGen = email[0].tipoDespa_web
+      sessionStorage.setItem('Tipo', this.typeGen);
+      // console.log(this.typeGen);
+    })
 
   }
 
@@ -70,7 +90,9 @@ export class ConsfacComponent implements OnInit {
   
     this.sliceNameFact = a.slice(0,2);
     this._typ = this.sliceNameFact;
+    localStorage.setItem('tipo', this.sliceNameFact);
     this.sliceNameFactB = a.slice(2,10);
+    localStorage.setItem('factura_number', this.sliceNameFactB);
     this._options = this.sliceNameFactB;
     this._name = b;
     this.getFacts( '_opt_', this.sliceNameFact, this.sliceNameFactB, 'V' );
@@ -126,6 +148,152 @@ export class ConsfacComponent implements OnInit {
         autoIncrement: true
       });      
     }
+  }
+
+  public arrCabSave: any = [];
+  public arrDetSave: any = [];
+  public em: any = [];
+  public Token = this.tGener.tGenerate(14);
+  public dataOfflineDBRecovery: any = [];
+  saveDespachoscab() {
+
+    
+     
+    this.arrCabSave = {
+      T_llave: this.Token,
+      tempo: "tempo1",
+      tipo: sessionStorage.getItem('Tipo'),
+      fecha_tra: new Date(),
+      bodega: localStorage.getItem('bodega'),
+      usercla: "web_test",
+      referencia: this.sliceNameFact + this.sliceNameFactB
+    } 
+
+    this.desSave.despachoSaveCab(this.arrCabSave).subscribe( scab => {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-start',
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      })
+      
+      Toast.fire({
+        icon: 'success',
+        html: `Transacción guardada exitosamente con token:<strong>${this.Token}</strong>`
+      })
+      
+      this.saveDespachosdet();
+      console.log(scab);
+      
+    }, (err) => {
+
+      Swal.fire(
+        '¿Problemas de conexión?',
+        'Hemos guardado tu transacción en base de datos local. Con este token: ' + this.Token,
+        'info'
+      )
+
+      this.dataOfflineDBRecovery = {
+        T_llave: this.Token,
+        tempo: "tempo1",
+        tipo: sessionStorage.getItem('Tipo'),
+        fecha_tra: new Date(),
+        bodega: localStorage.getItem('bodega'),
+        usercla: "web_test",
+        referencia: this.sliceNameFact + this.sliceNameFactB,
+        linea: Number(localStorage.getItem('linea')),
+        no_parte: localStorage.getItem('no_parte'),
+        cantidad: Number(localStorage.getItem('p_cantidad')),
+      }
+
+      console.log(this.dataOfflineDBRecovery);
+
+        //this.createRecoveryDBTransaccional(this.dataOfflineDBRecovery);
+        //alert('No se ha guardado la cabecera');
+
+    })
+
+  }
+
+
+  createRecoveryDBTransaccional(data) {
+    this.iDB.createIndexedDB('transaction-db', 1);
+    this.iDB.saveDataIndexedDB('transaction-db', 1, data);
+  }
+
+  saveDespachosdet() {
+
+    this.arrDetSave = {
+      T_llave: this.Token,
+      tempo: "tempo1",
+      linea: Number(localStorage.getItem('linea')),
+      no_parte: localStorage.getItem('no_parte'),
+      cantidad: Number(localStorage.getItem('p_cantidad')),
+    }
+
+    console.log(this.arrDetSave);
+
+    this.desSave.despachoSaveDet(this.arrDetSave).subscribe( sdet => {
+      console.log(sdet);
+      
+    }, (err) => {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      })
+      
+      Toast.fire({
+        icon: 'info',
+        html: `Hemos tenido un problema, al guardar el<strong> detalle </strong>la siguiente transacción con el siguiente token :<strong>${this.Token}</strong>`
+      })
+
+      // alert('No se ha guardado el detalle');
+
+    })
+
+  }
+
+  valdeteScann(a) {
+
+    let b = <HTMLInputElement> document.getElementById('scann');
+
+    localStorage.setItem('p_diferen', a);
+    this.total = localStorage.getItem('p_diferen');
+
+    if(a > localStorage.getItem('p_cantidad')) {
+      this.scaningQR = Number(localStorage.getItem('p_cantidad'));
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      })
+      
+      Toast.fire({
+        icon: 'info',
+        title: 'Haz eccedido el limite de escaneos con relación a la cantidad estipulada'
+      })
+
+      b.disabled = true;
+
+    }
 
   }
 
@@ -148,16 +316,21 @@ export class ConsfacComponent implements OnInit {
   }
 
    getFacts(a,b,c,d) {
-    
+    let z = <HTMLInputElement> document.getElementById('scann');
     this.dataFact.getfactura(a,b,c,d).subscribe( FACTS => {
       this.arrFacts = FACTS;
+      this.scaningQR = 0;
+      z.disabled = false;
       console.log(this.arrFacts);
       for( let k = 0; k <= this.arrFactsType.length; k++ ) {
         
            this._bodega = this.arrFacts[k].bodega;
            localStorage.setItem('bodega',   this.arrFacts[k].bodega);
            localStorage.setItem('cantidad', this.arrFacts[k].cantidad);
+           localStorage.setItem('nomCliente', this.arrFacts[k].nomCliente);
+           localStorage.setItem('comprobante', this.arrFacts[k].comprobante);
            localStorage.setItem('no_parte', this.arrFacts[k].no_parte);
+           localStorage.setItem('linea', this.arrFacts[k].linea);
            this.total = this.arrFacts[k].cantidad - Number(localStorage.getItem('scann_number'));
            localStorage.setItem('total', this.total);
            
@@ -198,7 +371,7 @@ export class ConsfacComponent implements OnInit {
                 popup: 'animate__animated animate__fadeOutUp'
               }
             })
-
+            
           }
 
           else {
