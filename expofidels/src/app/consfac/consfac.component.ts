@@ -36,6 +36,7 @@ export class ConsfacComponent implements OnInit {
   public diferencia;  
   //#endregion 
   public typeGen: string;
+  public arrCursorFact:any = [];
 
   constructor( public dataFact: ControlprodService,
                public iDB: IndexedDBService,
@@ -44,11 +45,15 @@ export class ConsfacComponent implements OnInit {
                public emServGen:EmailcontrolService  ) { }
 
   ngOnInit() {
-    this.getFacts('_opt_', 'FA', '00000599', 'V');
+
+    this.getFactsGen();
+
+    //this.readDB('facturas-type-DB');
+    // this.getFacts('_opt_', 'FA', '00000599', 'V');
     this.getFactType('0', '50');
     this.datesNow();
     this.dbREAD('scanDB');
-    this.scaningQR = Number(localStorage.getItem('scann_number'));  
+    this.scaningQR = Number(localStorage.getItem('scann_number'));
 
     this.nombre      =    localStorage.getItem('p_nombre');
     this.codigo      =    localStorage.getItem('p_codigo');
@@ -61,20 +66,47 @@ export class ConsfacComponent implements OnInit {
     this._options = localStorage.getItem('factura_number');
     this._name = localStorage.getItem('nomCliente');
 
-
     this.emServGen.getEmail().subscribe( email => {
       this.em = email;
       this.typeGen = email[0].tipoDespa_web
       sessionStorage.setItem('Tipo', this.typeGen);
       // console.log(this.typeGen);
+    }, (err) => {})
+
+  }
+
+  getFactsGen() {    
+    this.dataFact.getfacttypegen(0).subscribe( F => {
+      this.arrFactsType = F;
+      //console.log(this.arrFactsType);
+      this.dataFact.createLibraryFacts(this.arrFactsType);
     })
-
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
-    //Add '${implements OnChanges}' to the class.    
-  }
+  
+
+  // readDB(database) {
+  //   var db;
+  //   const DBopen = indexedDB.open(database, 1)
+  //   DBopen.onsuccess = (e) => {
+  //     db = DBopen.result;
+  //     var transaction = db.transaction([database], 'readonly');
+  //     var objectStore = transaction.objectStore(database);
+  //     objectStore.openCursor().onsuccess = (e) => {       
+  //       const cursor = e.target.result;
+  //       if( cursor ) {          
+  //         this.arrCursorFact.push(cursor.value);
+  //         cursor.continue();
+  //         console.log(this.arrCursorFact);
+  //         return this.arrCursorFact;
+  //       }
+  //       else{
+  //         console.log('Ya se han desplegado todos los datos');
+  //       }        
+  //     }
+  //   }
+  // }
+
 
   persData(nom, cod, cant, esc, dif) {
 
@@ -108,8 +140,6 @@ export class ConsfacComponent implements OnInit {
     return this._dateNow = `${month}/${day}/${year}`;
  
   }
-
-
 
   public arrCursor: any = [];
   dbREAD(bd) {
@@ -155,10 +185,8 @@ export class ConsfacComponent implements OnInit {
   public em: any = [];
   public Token = this.tGener.tGenerate(14);
   public dataOfflineDBRecovery: any = [];
-  saveDespachoscab() {
-
-    
-     
+  saveDespachoscab() {    
+    sessionStorage.setItem('TOKEN', this.Token); 
     this.arrCabSave = {
       T_llave: this.Token,
       tempo: "tempo1",
@@ -188,7 +216,7 @@ export class ConsfacComponent implements OnInit {
       })
       
       this.saveDespachosdet();
-      console.log(scab);
+      //console.log(scab);
       
     }, (err) => {
 
@@ -210,11 +238,9 @@ export class ConsfacComponent implements OnInit {
         no_parte: localStorage.getItem('no_parte'),
         cantidad: Number(localStorage.getItem('p_cantidad')),
       }
-
-      console.log(this.dataOfflineDBRecovery);
-
-        //this.createRecoveryDBTransaccional(this.dataOfflineDBRecovery);
-        //alert('No se ha guardado la cabecera');
+      
+      this.createRecoveryDBTransaccional(this.dataOfflineDBRecovery);
+      location.reload();
 
     })
 
@@ -239,7 +265,7 @@ export class ConsfacComponent implements OnInit {
     console.log(this.arrDetSave);
 
     this.desSave.despachoSaveDet(this.arrDetSave).subscribe( sdet => {
-      console.log(sdet);
+      //console.log(sdet);
       
     }, (err) => {
       const Toast = Swal.mixin({
@@ -315,13 +341,18 @@ export class ConsfacComponent implements OnInit {
     })
   }
 
-   getFacts(a,b,c,d) {
+  
+
+  getFacts(a,b,c,d) {
     let z = <HTMLInputElement> document.getElementById('scann');
     this.dataFact.getfactura(a,b,c,d).subscribe( FACTS => {
       this.arrFacts = FACTS;
+      
+      //this.dataFact.createLibraryFacts(this.arrFacts);
+      
       this.scaningQR = 0;
       z.disabled = false;
-      console.log(this.arrFacts);
+
       for( let k = 0; k <= this.arrFactsType.length; k++ ) {
         
            this._bodega = this.arrFacts[k].bodega;
@@ -360,7 +391,7 @@ export class ConsfacComponent implements OnInit {
             localStorage.removeItem('scann_number');
             localStorage.setItem('total', '0');
             localStorage.setItem('scann_number', '0');
-            console.log('Esto es diferente');
+            //console.log('Esto es diferente');
 
             Swal.fire({
               title: 'Se reiniciará los scaneos ya que el código seleccionado es diferente',
@@ -382,7 +413,7 @@ export class ConsfacComponent implements OnInit {
                           localStorage.getItem('scann_number'),
                           this.arrFacts[k].cantidad - Number(localStorage.getItem('scann_number')));
 
-                          console.log('Esto es igual');
+                          //console.log('Esto es igual');
 
           }
 

@@ -45,9 +45,11 @@ export class IndexedDBService {
 
   elBDData(databaseName) {
      return indexedDB.deleteDatabase(databaseName);
-  }
+  }  
 
 }
+
+
 
 
 

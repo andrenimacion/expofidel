@@ -1,0 +1,39 @@
+<table class="table table-dark table-sm table-hover table-bordered border border-dark">
+    <thead class="table-primary">
+      <tr>
+        <th scope="col">Key</th>
+        <th scope="col">Bodega</th>
+        <th scope="col">Cantidad</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Línea</th>
+        <th scope="col">Referencia</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let dataOff of arrCursor" >
+        <td>{{dataOff.T_llave}}</td>
+        <td>{{dataOff.bodega}}</td>
+        <td>{{dataOff.cantidad}}</td>
+        <td>{{dataOff.fecha_tra | date: 'short' }}</td>
+        <td>{{dataOff.linea}}</td>
+        <td>{{dataOff.referencia}}</td>       
+      </tr>
+      
+    </tbody>
+    
+</table>
+<div class="btnSets">
+    <button (click)="limpiarData()" class="sets btn btn-danger">
+        <mat-icon style="background-color: transparent !important;  font-size: 12pt;">
+            delete_sweep
+        </mat-icon>
+            Limpiar
+    </button>
+    <button (click)="sincronizarData()" class="sets btn btn-success">
+        <mat-icon style="background-color: transparent !important;
+                         font-size: 12pt;">
+            backup
+        </mat-icon>
+            Sincronizar
+    </button>
+</div>

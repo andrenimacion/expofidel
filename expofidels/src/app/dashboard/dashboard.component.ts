@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { PagonlineService } from '../services/pagonline.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -7,14 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
   showFiller = false;
+  panelOpenState = false;
 
   public height: number = screen.height - 165; 
   public heightApps: number = this.height - 49
 
-  constructor() { }
+  constructor( private msg: PagonlineService ) { }
 
   ngOnInit() {
     console.log(this.height)
+
+    this.msg.pOnline('mesasge');
+
   }
 
 }

@@ -1,24 +1,55 @@
-
+<div id="mesasge" class="container-fluid p-0 m-0"></div>
 
 <section class="header" [ngStyle]="{'height': height + 'px'}" >
 
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
-        <mat-icon>chevron_right</mat-icon>
+        <mat-icon>chevron_right  </mat-icon>
     </button>
 
-    <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
+    
+
+    <div class="offcanvas offcanvas-start" style="overflow-y: auto !important;" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Menú de acciones</h5>
           <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="men">
-            <mat-icon>mail</mat-icon>
-            Configurar Email
-        </div>
-        <div class="castMail container-fluid p-4">
-            <app-emailcontroller>
-            </app-emailcontroller>
-        </div>
+        
+        <mat-accordion>
+            <mat-expansion-panel (opened)="panelOpenState = true"
+            (closed)="panelOpenState = false">
+              <mat-expansion-panel-header>
+                <mat-panel-title>                
+                    <mat-icon>mail</mat-icon>
+                    <p class="title">
+                    Email
+                </p>
+                </mat-panel-title>
+                <mat-panel-description>     
+                   <span class="notes"> Envía las transacciones vía email...</span>
+                </mat-panel-description>
+                 
+              </mat-expansion-panel-header>
+              <div class="dv">
+                <app-emailcontroller></app-emailcontroller>
+            </div> 
+            </mat-expansion-panel>
+            <mat-expansion-panel (opened)="panelOpenState = true"
+                                 (closed)="panelOpenState = false">
+              <mat-expansion-panel-header>
+                <mat-panel-title>                  
+                    <mat-icon>fact_check</mat-icon>
+                    <p class="title">
+                         Transacciones por sincronizar                        
+                    </p>
+                </mat-panel-title>
+                <mat-panel-description>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+                <app-offline-data>
+                </app-offline-data>              
+            </mat-expansion-panel>
+        </mat-accordion>
+
     </div>
 
     <div class="head">

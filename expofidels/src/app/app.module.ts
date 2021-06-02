@@ -6,7 +6,6 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
-
 //#region Angular Material
 import {A11yModule} from '@angular/cdk/a11y';
 import {DragDropModule} from '@angular/cdk/drag-drop';
@@ -61,6 +60,7 @@ import { NgQrScannerModule } from 'angular2-qrscanner';
 import { EmailcontrollerComponent } from './emailcontroller/emailcontroller.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { OfflineDataComponent } from './offline-data/offline-data.component';
 
 @NgModule({
   declarations: [
@@ -69,10 +69,12 @@ import { environment } from '../environments/environment';
     ConsfacComponent,
     QrscannComponent,
     EmailcontrollerComponent,
+    OfflineDataComponent,
   ],
   imports: [
     NgQrScannerModule,
     // NgxSpinnerModule,
+    //#region 
     CdkStepperModule,
     CdkTableModule,
     CdkTreeModule,
