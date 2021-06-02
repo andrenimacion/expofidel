@@ -5,6 +5,8 @@ import Swal from 'sweetalert2';
 import { TInvcabgControllerService } from '../services/t-invcabg-controller.service';
 import { TokenGenerateService } from '../services/token-generate.service';
 import { EmailcontrolService } from '../services/emailcontrol.service';
+import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-consfac',
@@ -14,7 +16,7 @@ import { EmailcontrolService } from '../services/emailcontrol.service';
 export class ConsfacComponent implements OnInit {
 
   public _searchFacts: string;
-
+  public seesionToken = sessionStorage.getItem('Session-Key');
   public arrFacts: any = [];
   public arrFactsType: any = [];
   public _options: string;
@@ -45,8 +47,8 @@ export class ConsfacComponent implements OnInit {
                public emServGen:EmailcontrolService  ) { }
 
   ngOnInit() {
-
-    this.getFactsGen();
+   // this.controlSaveDataObserver();
+    //this.getFactsGen();
 
     //this.readDB('facturas-type-DB');
     // this.getFacts('_opt_', 'FA', '00000599', 'V');
@@ -75,38 +77,13 @@ export class ConsfacComponent implements OnInit {
 
   }
 
-  getFactsGen() {    
-    this.dataFact.getfacttypegen(0).subscribe( F => {
-      this.arrFactsType = F;
-      //console.log(this.arrFactsType);
-      this.dataFact.createLibraryFacts(this.arrFactsType);
-    })
-  }
-
-  
-
-  // readDB(database) {
-  //   var db;
-  //   const DBopen = indexedDB.open(database, 1)
-  //   DBopen.onsuccess = (e) => {
-  //     db = DBopen.result;
-  //     var transaction = db.transaction([database], 'readonly');
-  //     var objectStore = transaction.objectStore(database);
-  //     objectStore.openCursor().onsuccess = (e) => {       
-  //       const cursor = e.target.result;
-  //       if( cursor ) {          
-  //         this.arrCursorFact.push(cursor.value);
-  //         cursor.continue();
-  //         console.log(this.arrCursorFact);
-  //         return this.arrCursorFact;
-  //       }
-  //       else{
-  //         console.log('Ya se han desplegado todos los datos');
-  //       }        
-  //     }
-  //   }
+  // getFactsGen() {    
+  //   this.dataFact.getfacttypegen(0).subscribe( F => {
+  //     this.arrFactsType = F;
+  //     //console.log(this.arrFactsType);
+  //     this.dataFact.createLibraryFacts(this.arrFactsType);
+  //   })
   // }
-
 
   persData(nom, cod, cant, esc, dif) {
 
@@ -118,8 +95,7 @@ export class ConsfacComponent implements OnInit {
 
   }
 
-  sliceNameFactF = (a, b) => {
-  
+  sliceNameFactF = (a, b) => {  
     this.sliceNameFact = a.slice(0,2);
     this._typ = this.sliceNameFact;
     localStorage.setItem('tipo', this.sliceNameFact);
@@ -127,19 +103,17 @@ export class ConsfacComponent implements OnInit {
     localStorage.setItem('factura_number', this.sliceNameFactB);
     this._options = this.sliceNameFactB;
     this._name = b;
-    this.getFacts( '_opt_', this.sliceNameFact, this.sliceNameFactB, 'V' );
-  
+    this.getFacts( '_opt_', this.sliceNameFact, this.sliceNameFactB, 'V' );  
   }
 
   datesNow() {  
-
     let fecha = new Date();
     let year = fecha.getFullYear();
     let day = fecha.getDay();
     let month = fecha.getMonth();
-    return this._dateNow = `${month}/${day}/${year}`;
- 
+    return this._dateNow = `${month}/${day}/${year}`; 
   }
+
 
   public arrCursor: any = [];
   dbREAD(bd) {
@@ -151,32 +125,27 @@ export class ConsfacComponent implements OnInit {
 
     //funcion capta los requirimientos positivos de mis transacciones
     request.onsuccess = (e) => {
-
       db = request.result;
       const transaction =  db.transaction([bd], 'readwrite');
       const objectStore = transaction.objectStore(bd);
-      
       objectStore.openCursor().onsuccess = (e) => {
 
       const cursor = e.target.result; 
-        if( cursor ) {
-        
+
+        if( cursor ) {        
           this.arrCursor.push(cursor.value);
           cursor.continue();
           this.scaningQR = this.arrCursor.length;
-          localStorage.setItem('scann_number', this.scaningQR.toString());
-        
+          localStorage.setItem(bd, this.scaningQR.toString());        
         }
-
       }
-
     }
 
-    request.onupgradeneeded = () => {      
+    request.onupgradeneeded = () => {
       db = request.result;
       db.createObjectStore(bd, {
         autoIncrement: true
-      });      
+      });
     }
   }
 
@@ -186,16 +155,17 @@ export class ConsfacComponent implements OnInit {
   public Token = this.tGener.tGenerate(14);
   public dataOfflineDBRecovery: any = [];
   saveDespachoscab() {    
-    sessionStorage.setItem('TOKEN', this.Token); 
+    sessionStorage.setItem('TRANSACCION-KEY', this.Token); 
+    sessionStorage.removeItem('TOKEN'); 
     this.arrCabSave = {
-      T_llave: this.Token,
-      tempo: "tempo1",
+      T_llave: sessionStorage.getItem('Session-Key'),
+      tempo: "despacho",
       tipo: sessionStorage.getItem('Tipo'),
       fecha_tra: new Date(),
       bodega: localStorage.getItem('bodega'),
-      usercla: "web_test",
+      usercla: sessionStorage.getItem('Token-User'),
       referencia: this.sliceNameFact + this.sliceNameFactB
-    } 
+    }
 
     this.desSave.despachoSaveCab(this.arrCabSave).subscribe( scab => {
       const Toast = Swal.mixin({
@@ -227,12 +197,12 @@ export class ConsfacComponent implements OnInit {
       )
 
       this.dataOfflineDBRecovery = {
-        T_llave: this.Token,
-        tempo: "tempo1",
+        T_llave: sessionStorage.getItem('Session-Key'),
+        tempo: "despacho",
         tipo: sessionStorage.getItem('Tipo'),
         fecha_tra: new Date(),
         bodega: localStorage.getItem('bodega'),
-        usercla: "web_test",
+        usercla: sessionStorage.getItem('Token-User'),
         referencia: this.sliceNameFact + this.sliceNameFactB,
         linea: Number(localStorage.getItem('linea')),
         no_parte: localStorage.getItem('no_parte'),
@@ -252,11 +222,37 @@ export class ConsfacComponent implements OnInit {
     this.iDB.saveDataIndexedDB('transaction-db', 1, data);
   }
 
+  public arrExec: any = [];
+  public comproba: string;
+  public comprobaA: string;
+  public comprobaB: string;
+  exec() {
+    this.desSave.getExec(this.seesionToken, 'despacho').subscribe( exec => {
+      
+      this.arrExec = exec;
+      this.comproba = this.arrExec[0].comproba;
+      this.comprobaA = this.comproba.slice(0,2);
+      this.comprobaB = this.comproba.slice(2,10);
+      localStorage.setItem('Comprobante-type', this.comprobaA);
+      localStorage.setItem('Comprobante-number', this.comprobaB);
+      console.log(this.comproba);
+    
+    })
+  }
+
+  public exeReportArr: any = [];
+  execReport() {
+    this.desSave.getExecReport(localStorage.getItem('Comprobante-type'), localStorage.getItem('Comprobante-number')).subscribe (execr => {
+      this.exeReportArr = execr;
+      console.log(this.exeReportArr);
+    })
+  } 
+
   saveDespachosdet() {
 
     this.arrDetSave = {
-      T_llave: this.Token,
-      tempo: "tempo1",
+      T_llave: sessionStorage.getItem('Session-Key'),
+      tempo: "despacho",
       linea: Number(localStorage.getItem('linea')),
       no_parte: localStorage.getItem('no_parte'),
       cantidad: Number(localStorage.getItem('p_cantidad')),
@@ -265,9 +261,8 @@ export class ConsfacComponent implements OnInit {
     console.log(this.arrDetSave);
 
     this.desSave.despachoSaveDet(this.arrDetSave).subscribe( sdet => {
-      //console.log(sdet);
-      
-    }, (err) => {
+      //console.log(sdet);      
+    }, () => {
       const Toast = Swal.mixin({
         toast: true,
         position: 'center',
@@ -290,6 +285,35 @@ export class ConsfacComponent implements OnInit {
     })
 
   }
+
+  public observable: any;
+//this.exec(sessionStorage.getItem('Session-Key'), 'despacho')
+  controlSaveDataObserver() {
+    this.observable = new Observable(subscriber => {
+      subscriber.next(this.saveDespachoscab());
+      subscriber.next(this.saveDespachosdet());
+      subscriber.next(this.exec());
+      subscriber.next(this.execReport());
+      subscriber.complete();
+    });
+
+    this.rxjsFunction();
+
+  }
+
+
+  rxjsFunction() {
+    //console.log('just before subscribe');
+    this.observable.subscribe({
+    next(x) { x },
+    error(err) { console.error('something wrong occurred: ' + err); },
+    complete() { }
+    });
+
+    
+    //console.log('just after subscribe');
+  }
+
 
   valdeteScann(a) {
 
@@ -327,6 +351,7 @@ export class ConsfacComponent implements OnInit {
   getFactsUnit( type, top ) {
     this.dataFact.getfacttype(type, top).subscribe( typef => {
       this.arrFactsType = typef;
+      console.log(this.arrFactsType);
     }, (err)=> {
       console.log(err);
       Swal.fire({
@@ -412,8 +437,6 @@ export class ConsfacComponent implements OnInit {
                           this.arrFacts[k].cantidad,
                           localStorage.getItem('scann_number'),
                           this.arrFacts[k].cantidad - Number(localStorage.getItem('scann_number')));
-
-                          //console.log('Esto es igual');
 
           }
 

@@ -1,0 +1,54 @@
+<div id="formActionA" class="animated fadeIn slow">
+    <div class="logo">
+        <img src="../../assets/logo-web.png" style="width: auto; height: 150px;">
+    </div>
+    <div id="content" class="">
+        <div class="box-form" id="boxSign" *ngIf="false">
+            <p id="SignIn"><span class="icon-users"></span>Sign In</p>
+        </div>
+        <div class="box-form" id="boxLog" *ngIf="false">
+            <p id="LogIn">Log In</p>
+        </div>
+    </div>
+
+    <div id="formularioLogIn">
+        <div id="source2"></div>
+        <!--login form INICIO-->
+
+        <form id="formInt1">
+            <div class="labelInputs mt-2 mb-2">
+                <label for="usuario"><span class="icon-adult"></span>Usuario:</label>
+                <input type="text"
+                       id="usuario"
+                       class="inputs"
+                       placeholder="Usuario"
+                       requerid
+                       [(ngModel)]="usuario" name="usuario">
+            </div>
+            <div class="labelInputs mt-2 mb-2">
+                <label for="password"><span class="icon-lock-open-1"></span>Contraseña:</label>
+                <input [type]="passwordType"
+                       id="pass"
+                       class="inputs"
+                       placeholder="*****"
+                       requerid
+                       [(ngModel)]="password"
+                       name="password">
+
+                <div class="showPass">
+                    <span class=" icon-eye-3 mt-2" id="eyeA"
+                          style="cursor:pointer;" item-end (click)="passwordHidShow()"></span>
+                    
+                    <p class="note" id="sowerCasePass1"></p>
+                </div>
+            </div>
+            <input type="submit" value="Iniciar Sesión"
+                   id="loginButton" name="submit"
+                   class="btn btn-primary mt-3 mb-3"
+                   (click)="logeo()" >
+
+        </form>
+
+    </div>
+
+</div>

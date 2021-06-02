@@ -1,0 +1,163 @@
+#bg-2 {
+    width: 100%;
+    height: auto;
+    position: absolute;
+    z-index: 4;
+    opacity: 0.4;
+    top: 50%;
+    margin-top: -75px;
+}
+
+#formulario {
+    font-family: 'Montserrat', sans-serif;
+    width: 400px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.inputs {
+    text-align: left;
+    width: 100%;
+    padding-left: 10px;
+    border-radius: 5px;
+    background-color: #e6ebf8;
+    color: rgb(49, 69, 99);
+    border: none;
+    transition: ease all 1s;
+}
+
+.inputs:hover {
+    transition: ease all 1s;
+    box-shadow: 0px 0px 15px rgba(12, 10, 34, 0.7);
+}
+
+#formActionA {
+    padding-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.formInt {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#logo {
+    display: flex;
+    justify-content: center;
+}
+
+#content {
+    border-radius: 10px;
+    border: solid 1px rgb(230, 230, 230);
+}
+
+.labelInputs {
+    color: gray;
+    text-align: center;
+}
+
+.box-form {
+    width: 140px;
+    height: auto;
+    color: gray;
+    border-radius: 10px;
+    border-top: 0px solid rgb(119, 164, 223);
+    cursor: pointer;
+    transition: ease all 0.3s;
+}
+
+.box-form:hover {
+    transition: ease all 0.5s;
+    border-top: 0.4px solid rgb(204, 236, 255);
+    animation: flowGlow ease-in 0.5s;
+}
+
+@keyframes flowGlow {
+    0% {
+        border-top: 0px solid rgb(204, 236, 255);
+        box-shadow: 0px -8px 8px rgba(105, 205, 255, 0.5);
+    }
+    50% {
+        border-top: 3px solid rgb(204, 236, 255);
+        box-shadow: 0px -8px 8px rgba(157, 235, 255, 0.8);
+    }
+}
+
+#SignIn,
+#LogIn {
+    margin-top: 10px;
+}
+
+#content {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+}
+
+
+/*responsive INICIO*/
+
+@media(max-width: 850px) {
+    #formulario {
+        width: 70%;
+        height: auto;
+    }
+}
+
+@media(max-width: 478px) {
+    #formulario {
+        width: 100%;
+        height: auto;
+    }
+}
+
+
+/*responsive FIN*/
+
+#showPass {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 12pt;
+}
+
+.note {
+    font-size: 8pt;
+    width: 200px;
+    height: auto;
+}
+
+#signInButton,
+#loginButton 
+    background rgb(76, 128, 148)
+    transition ease all 0.4s
+    border none
+    border-bottom solid 1px rgba(67, 173, 226, 1)
+
+
+#signInButton:hover {
+    transition: ease all 0.5s;
+    box-shadow: 0px 0px 10px rgba(12, 10, 34, 0.7);
+}
+
+#loginButton {
+    width: 100%;
+}
+
+#loginButton:hover {
+    transition: ease all 0.5s;
+    box-shadow: 0px 0px 10px rgba(12, 10, 34, 0.7);
+}
+
+#source {
+    background: rgb(9, 44, 57);
+    background: linear-gradient(175deg, rgba(9, 44, 57, 1) 0%, rgba(13, 42, 66, 1) 30%, rgba(2, 22, 33, 0.5452586206896552) 60%, rgba(3, 23, 78, 0) 100%);
+}

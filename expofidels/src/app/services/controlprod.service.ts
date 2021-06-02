@@ -18,7 +18,7 @@ export class ControlprodService {
   getfacttype = (type, top) => this.http.get( this.urlapi + `controlprod/getFactsType/${type}/${top}`);
   
   //obtiens los tipos de facturas existentes
-  getfacttypegen = (type) => this.http.get( this.urlapi + `controlprod/getFactsGen/${type}`);
+  //getfacttypegen = (type) => this.http.get( this.urlapi + `controlprod/getFactsGen/${type}`);
 
   createLibraryFacts(data) {
     console.log(data);

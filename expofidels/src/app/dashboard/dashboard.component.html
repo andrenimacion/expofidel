@@ -1,5 +1,5 @@
-<div id="mesasge" class="container-fluid p-0 m-0"></div>
-
+<!-- <div id="mesasge" class="container-fluid p-0 m-0"></div> -->
+<app-header></app-header>
 <section class="header" [ngStyle]="{'height': height + 'px'}" >
 
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
@@ -15,6 +15,26 @@
         </div>
         
         <mat-accordion>
+            <mat-expansion-panel (opened)="panelOpenState = true"
+            (closed)="panelOpenState = false">
+              <mat-expansion-panel-header>
+                <mat-panel-title>                
+                    <mat-icon>account_circle</mat-icon>
+                    <p class="title">
+                    Usuario
+                </p>
+                </mat-panel-title>
+                <mat-panel-description>     
+                   <span class="notes"> Modifica tu cuenta de usuario...</span>
+                </mat-panel-description>
+                 
+              </mat-expansion-panel-header>
+              <div (click)="closesession()"  class="dvi">
+                <button class="btn btn-danger">
+                 <mat-icon>power_settings_new</mat-icon> Cerrar sesión
+                </button>
+              </div> 
+            </mat-expansion-panel>
             <mat-expansion-panel (opened)="panelOpenState = true"
             (closed)="panelOpenState = false">
               <mat-expansion-panel-header>

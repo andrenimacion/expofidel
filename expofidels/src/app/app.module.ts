@@ -61,6 +61,8 @@ import { EmailcontrollerComponent } from './emailcontroller/emailcontroller.comp
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { OfflineDataComponent } from './offline-data/offline-data.component';
+import { LoginComponent } from './login/login.component';
+import { HeaderComponent } from './header/header.component';
 
 @NgModule({
   declarations: [
@@ -70,6 +72,8 @@ import { OfflineDataComponent } from './offline-data/offline-data.component';
     QrscannComponent,
     EmailcontrollerComponent,
     OfflineDataComponent,
+    LoginComponent,
+    HeaderComponent,
   ],
   imports: [
     NgQrScannerModule,
@@ -124,14 +128,19 @@ import { OfflineDataComponent } from './offline-data/offline-data.component';
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot([
-      { path: 'dash',   component: DashboardComponent     },
-      { path: '**', pathMatch: 'full', redirectTo: 'dash' }
+      { path: 'dash',   component: DashboardComponent },
+      { path: 'Login', component: LoginComponent, pathMatch: 'full' },
+      { path: '**', pathMatch: 'full', redirectTo: 'Login'  }
     ]),
+
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+  
   ],
+
   providers: [],
   bootstrap: [AppComponent]
+
 })
 
 export class AppModule { }
