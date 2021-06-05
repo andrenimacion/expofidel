@@ -47,11 +47,6 @@ export class ConsfacComponent implements OnInit {
                public emServGen:EmailcontrolService  ) { }
 
   ngOnInit() {
-   // this.controlSaveDataObserver();
-    //this.getFactsGen();
-
-    //this.readDB('facturas-type-DB');
-    // this.getFacts('_opt_', 'FA', '00000599', 'V');
     this.getFactType('0', '50');
     this.datesNow();
     this.dbREAD('scanDB');
@@ -77,13 +72,11 @@ export class ConsfacComponent implements OnInit {
 
   }
 
-  // getFactsGen() {    
-  //   this.dataFact.getfacttypegen(0).subscribe( F => {
-  //     this.arrFactsType = F;
-  //     //console.log(this.arrFactsType);
-  //     this.dataFact.createLibraryFacts(this.arrFactsType);
-  //   })
-  // }
+
+  createStructureDataTransac(data) {
+    this.iDB.createIndexedDB('transac-control-db', 1);
+    this.iDB.saveDataIndexedDB('transac-control-db', 1, data);
+  }
 
   persData(nom, cod, cant, esc, dif) {
 
@@ -106,12 +99,14 @@ export class ConsfacComponent implements OnInit {
     this.getFacts( '_opt_', this.sliceNameFact, this.sliceNameFactB, 'V' );  
   }
 
-  datesNow() {  
+  datesNow() { 
+
     let fecha = new Date();
     let year = fecha.getFullYear();
     let day = fecha.getDay();
     let month = fecha.getMonth();
     return this._dateNow = `${month}/${day}/${year}`; 
+  
   }
 
 
@@ -154,9 +149,11 @@ export class ConsfacComponent implements OnInit {
   public em: any = [];
   public Token = this.tGener.tGenerate(14);
   public dataOfflineDBRecovery: any = [];
+  
   saveDespachoscab() {    
     sessionStorage.setItem('TRANSACCION-KEY', this.Token); 
-    sessionStorage.removeItem('TOKEN'); 
+    sessionStorage.removeItem('TOKEN');
+    
     this.arrCabSave = {
       T_llave: sessionStorage.getItem('Session-Key'),
       tempo: "despacho",
@@ -242,9 +239,13 @@ export class ConsfacComponent implements OnInit {
 
   public exeReportArr: any = [];
   execReport() {
-    this.desSave.getExecReport(localStorage.getItem('Comprobante-type'), localStorage.getItem('Comprobante-number')).subscribe (execr => {
+    
+    this.desSave.getExecReport(localStorage.getItem('Comprobante-type'),
+                               localStorage.getItem('Comprobante-number'))
+                               .subscribe (execr => {
       this.exeReportArr = execr;
-      console.log(this.exeReportArr);
+      this.getComprobantController(this.exeReportArr);
+    
     })
   } 
 
@@ -261,8 +262,12 @@ export class ConsfacComponent implements OnInit {
     console.log(this.arrDetSave);
 
     this.desSave.despachoSaveDet(this.arrDetSave).subscribe( sdet => {
-      //console.log(sdet);      
+      //esto es el detalle      
+      this.arrDetSave = sdet;
+      console.log('----------Esto es el detalle:----------');
+      console.log(this.arrDetSave);
     }, () => {
+
       const Toast = Swal.mixin({
         toast: true,
         position: 'center',
@@ -270,17 +275,16 @@ export class ConsfacComponent implements OnInit {
         timer: 5000,
         timerProgressBar: true,
         didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
+          toast.addEventListener('mouseenter', Swal.stopTimer);
+          toast.addEventListener('mouseleave', Swal.resumeTimer);
         }
+
       })
       
       Toast.fire({
         icon: 'info',
         html: `Hemos tenido un problema, al guardar el<strong> detalle </strong>la siguiente transacción con el siguiente token :<strong>${this.Token}</strong>`
       })
-
-      // alert('No se ha guardado el detalle');
 
     })
 
@@ -290,11 +294,13 @@ export class ConsfacComponent implements OnInit {
 //this.exec(sessionStorage.getItem('Session-Key'), 'despacho')
   controlSaveDataObserver() {
     this.observable = new Observable(subscriber => {
+      
       subscriber.next(this.saveDespachoscab());
       subscriber.next(this.saveDespachosdet());
       subscriber.next(this.exec());
       subscriber.next(this.execReport());
       subscriber.complete();
+
     });
 
     this.rxjsFunction();
@@ -303,15 +309,13 @@ export class ConsfacComponent implements OnInit {
 
 
   rxjsFunction() {
-    //console.log('just before subscribe');
+    
     this.observable.subscribe({
     next(x) { x },
     error(err) { console.error('something wrong occurred: ' + err); },
     complete() { }
     });
-
     
-    //console.log('just after subscribe');
   }
 
 
@@ -366,13 +370,21 @@ export class ConsfacComponent implements OnInit {
     })
   }
 
-  
+  getComprobantController(data) {
+    this.iDB.createIndexedDB('comprobant-db', 1);
+    this.iDB.saveDataIndexedDB('comprobant-db', 1, data);
+  }
 
   getFacts(a,b,c,d) {
     let z = <HTMLInputElement> document.getElementById('scann');
     this.dataFact.getfactura(a,b,c,d).subscribe( FACTS => {
       this.arrFacts = FACTS;
-      
+      //esto es las transaciiones generales
+      console.log('esto es las transaciiones generales');
+      console.log(this.arrFacts);
+
+      this.createStructureDataTransac(this.arrFacts);
+
       //this.dataFact.createLibraryFacts(this.arrFacts);
       
       this.scaningQR = 0;

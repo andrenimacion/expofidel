@@ -63,6 +63,7 @@ import { environment } from '../environments/environment';
 import { OfflineDataComponent } from './offline-data/offline-data.component';
 import { LoginComponent } from './login/login.component';
 import { HeaderComponent } from './header/header.component';
+import { ReporteComponent } from './reporte/reporte.component';
 
 @NgModule({
   declarations: [
@@ -74,6 +75,7 @@ import { HeaderComponent } from './header/header.component';
     OfflineDataComponent,
     LoginComponent,
     HeaderComponent,
+    ReporteComponent,
   ],
   imports: [
     NgQrScannerModule,
@@ -129,6 +131,7 @@ import { HeaderComponent } from './header/header.component';
     ReactiveFormsModule,
     RouterModule.forRoot([
       { path: 'dash',   component: DashboardComponent },
+      { path: 'reporttransac',   component: ReporteComponent },
       { path: 'Login', component: LoginComponent, pathMatch: 'full' },
       { path: '**', pathMatch: 'full', redirectTo: 'Login'  }
     ]),

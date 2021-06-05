@@ -96,10 +96,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="td">{{codigo}}</td>
-              <td class="td">{{nombre}}</td>
-              <td class="td">{{cantidad}}</td>
+            <tr *ngFor=" let factSArr of arrFacts ">
+              <td class="td">{{factSArr.no_parte}}</td>
+              <td class="td">{{factSArr.nomParte}}</td>
+              <td class="td">{{factSArr.cantidad}}</td>
               <td style="width: 65px;" >
                 <input id="scann"
                        style="color: gray !important;"
@@ -109,7 +109,7 @@
                        (keyup)="valdeteScann(scaningQR)"
                        (keyup.enter)="valdeteScann(scaningQR)" type="number" class="form-control"  >               
               </td>
-              <td class="td">{{cantidad - scaningQR }}</td>
+              <td class="td">{{factSArr.cantidad - scaningQR }}</td>
             </tr>
         </tbody>
       </table>
