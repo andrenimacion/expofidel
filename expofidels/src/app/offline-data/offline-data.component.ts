@@ -22,7 +22,7 @@ public arrCursor:any = [];
 
     //console.log('--------Leyendo las transacciones offline------')
 
-    this.readDB('transaction-db');
+    //this.readDB('transaction-db');
 
   }
 

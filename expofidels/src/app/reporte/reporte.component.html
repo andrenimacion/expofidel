@@ -1,22 +1,40 @@
-<div class="container" >
+<div class="container-fluid" >
 
     <div class="title">
-        Reporte de despacho
+       <p> Reporte de despacho</p> <p class="number-note">{{_n_reporte}}</p> 
     </div>
-    <div class=" head container p-3">
+    <div class=" head container-fluid ">
         <div class="he1">
-            Cliente:<br> {{_cliente}}
-            Dirección:<br>{{_direccion}}
-            Bodega:<br>{{_bodega}}
-            Concepto:<br>{{_concepto}}
+           <strong> Cliente: </strong> {{_cliente}}<br> 
+           <strong> Dirección:</strong>{{_direccion}}<br> 
+           <strong> Bodega: </strong>{{_bodega}}<br>     
+           <strong> Concepto: </strong> {{_concepto}}<br>   
         </div>
         <div class="he2">
-            R.U.C.:<br>{{_ruc}}
-            Teléfonos:<br>{{_telefono}}
-            Emisión:<br>{{_emision}}
-            F. Vencimiento:<br>{{_f_vencimiento}}
+           <strong> R.U.C.: </strong> {{_ruc}} <br>
+           <strong> Teléfonos: </strong> {{_telefono}} <br>
+           <strong> Emisión: </strong> {{_emision}} <br>
+           <strong> F. Vencimiento: </strong> <br>{{_f_vencimiento}}
         </div>
     </div>
-
+    <div class="table-responsive">
+        <table class="table table-bordered
+                      table-dark table-hover
+                      align-middle
+                      table-sm">
+            <thead>
+                <tr>
+                    <th>Detalle</th>
+                    <th>Cantidad</th>
+                    <th>Despachado</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody class="table-warning table-bordered" id="tbody-arr">
+                
+            </tbody>
+        </table>
+    </div>
+    <footer id="foot"><p class="foottext">{{_footer}}</p></footer>
 </div>
 

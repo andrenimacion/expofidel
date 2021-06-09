@@ -1,4 +1,3 @@
-
 <div class="menu mb-3" >
     <mat-form-field appearance="fill">
       <mat-label>Refer:</mat-label>
@@ -10,7 +9,7 @@
                [(ngModel)]="_searchFacts" >
 
         <mat-option [value]="aft.comproba"
-                    (click)="sliceNameFactF(aft.comproba, aft.nomCliente)"
+                    (click)="sliceNameFactF( aft.comproba, aft.nomCliente )"
                     [title]="aft.nomCliente"
                     *ngFor=" let aft of arrFactsType">
 
@@ -101,15 +100,27 @@
               <td class="td">{{factSArr.nomParte}}</td>
               <td class="td">{{factSArr.cantidad}}</td>
               <td style="width: 65px;" >
-                <input id="scann"
-                       style="color: gray !important;"
-                       [value]="scaningQR"
-                       [(ngModel)]="scaningQR"
-                       (change)="valdeteScann(scaningQR)"
-                       (keyup)="valdeteScann(scaningQR)"
-                       (keyup.enter)="valdeteScann(scaningQR)" type="number" class="form-control"  >               
+<!-- 
+                [value]="scaningQR"
+                [(ngModel)]="scaningQR" -->
+
+                <input style="color: gray !important;"
+                       (change)="valdeteScann()"
+                       (keyup)="valdeteScann()"
+                       (keyup.enter)="valdeteScann()"
+                       type="number"
+                       class="form-control">               
               </td>
-              <td class="td">{{factSArr.cantidad - scaningQR }}</td>
+              <td class="td">
+
+                <textarea cols="7" rows="1"
+                          class="form-control"                        
+                          disabled
+                          style="color: gray !important;">
+                
+                </textarea>
+
+              </td>
             </tr>
         </tbody>
       </table>
