@@ -308,11 +308,9 @@ valdeteScann() {
             b[ma].setAttribute('id', `id-${ma}`);
             let c = <HTMLInputElement> document.getElementById(`id-${ma}`);
             localStorage.setItem(`scan-qr-${ma}`, (Number(c.value)).toString());
-            //console.log((ma + 1));
 
-            localStorage.setItem(`diferencia-${mi}`, (Number(this.arrFacts[mi++].cantidad) - Number(c.value)).toString());
-            //console.log(this.arrFacts[mi].cantidad);
-           
+            console.log(localStorage.setItem(`diferencia-${mi}`, (Number(this.arrFacts[mi++].cantidad) - Number(c.value)).toString()));
+
           }
           
         }

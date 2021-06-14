@@ -215,9 +215,7 @@ var ConsfacComponent = /** @class */ (function () {
                 b[ma].setAttribute('id', "id-" + ma);
                 var c = document.getElementById("id-" + ma);
                 localStorage.setItem("scan-qr-" + ma, (Number(c.value)).toString());
-                //console.log((ma + 1));
-                localStorage.setItem("diferencia-" + mi, (Number(this.arrFacts[mi++].cantidad) - Number(c.value)).toString());
-                //console.log(this.arrFacts[mi].cantidad);
+                console.log(localStorage.setItem("diferencia-" + mi, (Number(this.arrFacts[mi++].cantidad) - Number(c.value)).toString()));
             }
         }
         // if(a > localStorage.getItem('p_cantidad')) {
