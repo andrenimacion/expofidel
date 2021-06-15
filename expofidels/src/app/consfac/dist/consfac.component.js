@@ -11,7 +11,6 @@ var core_1 = require("@angular/core");
 var sweetalert2_1 = require("sweetalert2");
 var rxjs_1 = require("rxjs");
 var ConsfacComponent = /** @class */ (function () {
-    //#endregion
     function ConsfacComponent(dataFact, iDB, desSave, tGener, emServGen) {
         var _this = this;
         this.dataFact = dataFact;
@@ -19,17 +18,23 @@ var ConsfacComponent = /** @class */ (function () {
         this.desSave = desSave;
         this.tGener = tGener;
         this.emServGen = emServGen;
+        //var report INICIO
+        this._reportBool = false;
         this.seesionToken = sessionStorage.getItem('Session-Key');
         this.arrFacts = [];
         this.arrFactsType = [];
         this.arrCursorFact = [];
-        /* variables para transacciones */
+        /* ----------------------- variables para transacciones INICIO -------------------------------------------- */
         //#region 
         this.arrCabSave = [];
         this.arrDetSave = [];
         this.em = [];
         this.Token = this.tGener.tGenerate(14);
         this.dataOfflineDBRecovery = [];
+        // createStructureDataTransac(data) {
+        //   this.iDB.createIndexedDB('transac-control-db', 1);
+        //   this.iDB.saveDataIndexedDB('transac-control-db', 1, data);
+        // }
         this.sliceNameFactF = function (a, b) {
             _this.sliceNameFact = a.slice(0, 2);
             _this._typ = _this.sliceNameFact;
@@ -42,12 +47,54 @@ var ConsfacComponent = /** @class */ (function () {
         };
         this.arrCursor = [];
         this.arrExec = [];
-        this.exeReportArr = [];
+        // public exeReportArr: any = [];
+        // execReport() {    
+        //   // console.log(localStorage.getItem('Comprobante-type'), localStorage.getItem('Comprobante-number'));
+        //   this.desSave.getExecReport(sessionStorage.getItem('Session-Key'), 'despacho').subscribe (execr => {
+        //     this.exeReportArr = execr;
+        //     //this.getComprobantController(this.exeReportArr);
+        //     console.log(this.exeReportArr);
+        //   })
+        // } 
+        //this.exec(sessionStorage.getItem('Session-Key'), 'despacho')
+        // controlSaveDataObserver() {
+        //   this.observable = new Observable(subscriber => {
+        //     subscriber.next(this.saveDespachos());
+        //     subscriber.complete();
+        //   });
+        //   this.rxjsFunction();
+        // }
+        // rxjsFunction() {
+        //   this.observable.subscribe({
+        //     next(x) { x },
+        //     error(err) { console.error('Ha ocurrido un error de ejecución: ' + err); },
+        //     complete() {
+        //       const Toast = Swal.mixin({
+        //         toast: true,
+        //         position: 'top-start',
+        //         showConfirmButton: false,
+        //         timer: 5000,
+        //         timerProgressBar: true,
+        //         didOpen: (toast) => {
+        //           toast.addEventListener('mouseenter', Swal.stopTimer)
+        //           toast.addEventListener('mouseleave', Swal.resumeTimer)
+        //         }
+        //       })
+        //       Toast.fire({
+        //         icon: 'success',
+        //         html: `Transacción guardada exitosamente
+        //                con token:<strong>${sessionStorage.getItem('Session-Key')}</strong>`
+        //               })
+        //      }
+        //     });
+        // }
         this._value = 0;
     }
     ConsfacComponent.prototype.ngOnInit = function () {
         var _this = this;
         //this.execReport();
+        //this.deleteChilds('tbody-arr', document.getElementsByTagName('tr'));
+        this.removesecuenceLocalStorage(1000);
         this.getFactType('0', '50');
         this.datesNow();
         this.dbREAD('scanDB');
@@ -62,9 +109,10 @@ var ConsfacComponent = /** @class */ (function () {
             sessionStorage.setItem('Tipo', _this.typeGen);
         }, function (err) { });
     };
-    ConsfacComponent.prototype.createStructureDataTransac = function (data) {
-        this.iDB.createIndexedDB('transac-control-db', 1);
-        this.iDB.saveDataIndexedDB('transac-control-db', 1, data);
+    ConsfacComponent.prototype.removesecuenceLocalStorage = function (numberSecuenceClean) {
+        for (var a = 0; a <= numberSecuenceClean; a++) {
+            localStorage.removeItem("cantsScann-" + a);
+        }
     };
     ConsfacComponent.prototype.datesNow = function () {
         var fecha = new Date();
@@ -116,38 +164,51 @@ var ConsfacComponent = /** @class */ (function () {
             usercla: sessionStorage.getItem('Token-User'),
             referencia: this.sliceNameFact + this.sliceNameFactB
         };
+        console.log(this.arrCabSave);
         this.desSave.despachoSaveCab(this.arrCabSave).subscribe(function (scab) {
-            _this.dataFact.getfactura('_opt_', _this.sliceNameFact, _this.sliceNameFactB, 'V').subscribe(function (FACTS) {
-                // Transaciiones generales
+            _this.dataFact.getfactura('_opt_', _this.sliceNameFact, _this.sliceNameFactB, 'V')
+                .subscribe(function (FACTS) {
+                // Transaciiones generales;
                 _this.arrFacts = FACTS;
-                _this.createStructureDataTransac(_this.arrFacts);
-                _this.exec();
-                /*Con este bucle recorremos el JSON de nuestra petición GET this.dataFact.getfactura(...)
-                  para enviar el resultado mediante un POST hacia la base de datos... */
-                for (var m = 0; m <= _this.arrFacts.length; m++) {
-                    _this.arrDetSave = {
-                        T_llave: sessionStorage.getItem('Session-Key'),
-                        tempo: "despacho",
-                        linea: _this.arrFacts[m].linea,
-                        no_parte: _this.arrFacts[m].no_parte,
-                        cantidad: _this.arrFacts[m].cantidad
-                    };
-                    _this.desSave.despachoSaveDet(_this.arrDetSave).subscribe(function (postDetail) {
-                        console.log(postDetail);
-                    });
-                }
+                // this.createStructureDataTransac(this.arrFacts);
+                /*Con este bucle recorremos el JSON de nuestra
+                 petición GET this.dataFact.getfactura(...)
+                 para enviar el resultado mediante
+                 un POST hacia la base de datos... */
+                //console.log(this.arrFacts);
+                _this.observable = new rxjs_1.Observable(function (subscriber) {
+                    subscriber.next(_this.saveDespachos());
+                    for (var m = 0; m <= _this.arrFacts.length; m++) {
+                        _this.arrDetSave = {
+                            T_llave: sessionStorage.getItem('Session-Key'),
+                            tempo: "despacho",
+                            linea: _this.arrFacts[m].linea,
+                            no_parte: _this.arrFacts[m].no_parte,
+                            cantidad: localStorage.getItem("scann-" + m)
+                        };
+                        subscriber.next(_this.saveDetalle(_this.arrDetSave));
+                    }
+                    subscriber.next(_this.exec());
+                    subscriber.complete();
+                });
             });
         }, function (err) {
-            sweetalert2_1["default"].fire('¿Problemas de conexión?', 'Hemos guardado tu transacción en base de datos local. Con este token: ' + _this.Token, 'info');
+            console.log(err);
+            // Swal.fire(
+            //   '¿Problemas de conexión?',
+            //   'Hemos guardado tu transacción en base de datos local. Con este token: ' + this.Token,
+            //   'info'
+            // )
         });
     };
     //#endregion
-    /* -------CREAMOS UNA BASE DE DATOS LOCAL
-    DONDE GUARDAMOS LA CABECERA DE LA TRANSACCIÓN ------- */
-    // createRecoveryDBTransaccional(data) {
-    //   this.iDB.createIndexedDB('transaction-db', 1);
-    //   this.iDB.saveDataIndexedDB('transaction-db', 1, data);
-    // }
+    ConsfacComponent.prototype.saveDetalle = function (content) {
+        var _this = this;
+        this.desSave.despachoSaveDet(content).subscribe(function (postDetail) {
+            console.log(postDetail);
+            _this.removesecuenceLocalStorage(1000);
+        });
+    };
     ConsfacComponent.prototype.getComprobantController = function (data) {
         this.iDB.createIndexedDB('comprobant-db', 1);
         this.iDB.saveDataIndexedDB('comprobant-db', 1, data);
@@ -155,53 +216,32 @@ var ConsfacComponent = /** @class */ (function () {
     ConsfacComponent.prototype.exec = function () {
         var _this = this;
         this.desSave.getExec(this.seesionToken, 'despacho').subscribe(function (exec) {
-            _this.arrExec = exec;
-            _this.comproba = _this.arrExec[0].comproba;
-            _this.comprobaA = _this.comproba.slice(0, 2);
-            _this.comprobaB = _this.comproba.slice(2, 10);
-            localStorage.setItem('Comprobante-type', _this.comprobaA);
-            localStorage.setItem('Comprobante-number', _this.comprobaB);
-            console.log(_this.comproba);
-        });
-    };
-    ConsfacComponent.prototype.execReport = function () {
-        var _this = this;
-        this.desSave.getExecReport(localStorage.getItem('Comprobante-type'), localStorage.getItem('Comprobante-number')).subscribe(function (execr) {
-            _this.exeReportArr = execr;
-            _this.getComprobantController(_this.exeReportArr);
-            console.log(_this.exeReportArr);
-        });
-    };
-    //this.exec(sessionStorage.getItem('Session-Key'), 'despacho')
-    ConsfacComponent.prototype.controlSaveDataObserver = function () {
-        var _this = this;
-        this.observable = new rxjs_1.Observable(function (subscriber) {
-            subscriber.next(_this.saveDespachos());
-            subscriber.next(_this.execReport());
-            subscriber.complete();
-        });
-        this.rxjsFunction();
-    };
-    ConsfacComponent.prototype.rxjsFunction = function () {
-        this.observable.subscribe({
-            next: function (x) { x; },
-            error: function (err) { console.error('something wrong occurred: ' + err); },
-            complete: function () {
-                var Toast = sweetalert2_1["default"].mixin({
-                    toast: true,
-                    position: 'top-start',
-                    showConfirmButton: false,
-                    timer: 5000,
-                    timerProgressBar: true,
-                    didOpen: function (toast) {
-                        toast.addEventListener('mouseenter', sweetalert2_1["default"].stopTimer);
-                        toast.addEventListener('mouseleave', sweetalert2_1["default"].resumeTimer);
-                    }
-                });
-                Toast.fire({
-                    icon: 'success',
-                    html: "Transacci\u00F3n guardada exitosamente\n                 con token:<strong>" + sessionStorage.getItem('Session-Key') + "</strong>"
-                });
+            _this.arrCursor = exec;
+            console.log(_this.arrExec);
+            _this._reportBool = true;
+            var v = document.getElementById('tbody-arr');
+            for (var i = 0; i <= _this.arrCursor.length; i++) {
+                //---------------------------------------------------------------
+                //bucle para recorre la cabecera
+                _this._n_reporte = " #" + (_this.arrCursor[i][0].tipo + _this.arrCursor[i][0].numero);
+                _this._cliente = _this.arrCursor[i][0].empcli;
+                _this._direccion = _this.arrCursor[i][0].direccion;
+                _this._bodega = _this.arrCursor[i][0].bodega;
+                _this._concepto = _this.arrCursor[i][0].comenta;
+                _this._ruc = _this.arrCursor[i][0].ruc;
+                _this._telefono = _this.arrCursor[i][0].fono1;
+                _this._emision = _this.arrCursor[i][0].fechA_TRA;
+                _this._f_vencimiento = _this.arrCursor[i][0].fecha_ven;
+                //---------------------------------------------------------------
+                //bucle para recorrer el detalle
+                for (var f = 0; f <= _this.arrCursor[i].length; f++) {
+                    var create_tr = document.createElement('tr');
+                    //const create_td = document.createElement('td');
+                    var ctr = v.appendChild(create_tr);
+                    _this.sumCantidad = Number(_this.arrCursor[i][f].cantidad);
+                    ctr.innerHTML = "<td style='font-size: 8pt;'>\n                            " + _this.arrCursor[i][f].nombre + "\n                           </td>\n                           <td style='font-size: 8pt;'>\n                            " + _this.arrCursor[i][f].cantidad + "\n                           </td>\n                           <td style='font-size: 8pt;'>\n                            " + _this.arrCursor[i][f].despacho + "\n                           </td>\n                           <td style='font-size: 8pt;'>\n                            " + (_this.arrCursor[i][f].cantidad
+                        - _this.arrCursor[i][f].despacho) + "\n                           </td> ";
+                }
             }
         });
     };
@@ -259,21 +299,67 @@ var ConsfacComponent = /** @class */ (function () {
     //#region
     ConsfacComponent.prototype.getFacts = function (a, b, c, d) {
         var _this = this;
+        var v = document.getElementById('tbody-arr');
         //let z = <HTMLInputElement> document.getElementById('scann');
         this.dataFact.getfactura(a, b, c, d).subscribe(function (FACTS) {
             _this.arrFacts = FACTS;
-            // esto es las transaciiones generales
-            _this.createStructureDataTransac(_this.arrFacts);
+            console.log(_this.arrFacts);
+            //variables para localstorage
+            localStorage.setItem('bodega', _this.arrFacts[0].bodega);
+            _this._bodega = localStorage.getItem('bodega');
+            //this.createStructureDataTransac(this.arrFacts);
             _this.scaningQR = 0;
-            //z.disabled = false;
-            for (var k = 0; k < _this.arrFacts.length; k++) {
-                console.log('funcionando');
-                _this._bodega = _this.arrFacts[k].bodega;
-                localStorage.setItem("cantidad-" + k, _this.arrFacts[k].cantidad);
-                //localStorage.setItem(`diferencia-${k}`, this.arrFacts[k].cantidad);
+            var _loop_1 = function (f) {
+                var create_tr = document.createElement('tr');
+                //const create_td = document.createElement('td'); 
+                var ctr = v.appendChild(create_tr);
+                //this.sumCantidad = Number(this.arrCursor[i][f].cantidad);
+                var opertoral;
+                var operMath = function (op1, op2) {
+                    opertoral = op1 - op2;
+                    console.log(opertoral);
+                    return opertoral;
+                };
+                ctr.innerHTML = "<td style='font-size: 8pt;'>\n        " + _this.arrFacts[f].no_parte + "\n        </td>\n        <td style='font-size: 8pt;'>\n        " + _this.arrFacts[f].nomParte + "\n        </td>\n        <td style='font-size: 8pt;'>\n        " + _this.arrFacts[f].cantidad + "\n        </td>\n        <td style='font-size: 8pt;'>\n        <input type=\"number\" id=\"idInput-" + f + "\" style=\"color: gray !important;\" >\n        </td>\n        <td style='font-size: 8pt;'>\n          <span id=\"sp-" + f + "\" ></span>\n        </td>";
+                //EVENTOS CREADOS PARA LA TABLA
+                //#region addeventlisteners
+                var bID = document.getElementById("idInput-" + f);
+                _this.cotrolEventListeners("idInput-" + f, "sp-" + f, 'change', _this.arrFacts[f].cantidad, f);
+                _this.cotrolEventListeners("idInput-" + f, "sp-" + f, 'click', _this.arrFacts[f].cantidad, f);
+                _this.cotrolEventListeners("idInput-" + f, "sp-" + f, 'keyup', _this.arrFacts[f].cantidad, f);
+            };
+            for (var f = 0; f <= _this.arrFacts.length; f++) {
+                _loop_1(f);
             }
         }, function (err) {
             console.log('No encontro la informacion' + err);
+        });
+    };
+    ConsfacComponent.prototype.deleteChilds = function (objectID, removeObject) {
+        document.getElementById(objectID).removeChild(removeObject);
+    };
+    ConsfacComponent.prototype.cotrolEventListeners = function (objectID, spanID, EVENT, valueB, secuence) {
+        var valueID = document.getElementById(objectID);
+        var sID = document.getElementById(spanID);
+        valueID.addEventListener(EVENT, function () {
+            if (Number(valueID.value) > valueB) {
+                //valueID.disabled = true;
+                valueID.style.border = 'solid 1px yellowgreen';
+                sID.innerText = '0';
+                valueID.value = valueB;
+                localStorage.setItem("cantsScann-" + secuence, valueB);
+                sweetalert2_1["default"].fire({
+                    icon: 'error',
+                    title: 'Hey',
+                    text: 'Has llegado al límite!"'
+                });
+            }
+            else {
+                //valueID.disabled = false;
+                sID.innerText = (valueB - Number(valueID.value)).toString();
+                localStorage.setItem("cantsScann-" + secuence, (valueB - Number(valueID.value)).toString());
+                localStorage.setItem("scann-" + secuence, (Number(valueID.value)).toString());
+            }
         });
     };
     //#endregion

@@ -12,6 +12,7 @@ export class ControlprodService {
   constructor( private http: HttpClient, public iDB: IndexedDBService ) { }  
 
   //obtiens los tipos las facturas por parámetros
+  //exec AR_controlprod
   getfactura  = (a,b,c,d) => this.http.get( this.urlapi + `controlprod/getFACTS/${a}/${b}/${c}/${d}`);
   
   //obtiens los tipos de facturas existentes

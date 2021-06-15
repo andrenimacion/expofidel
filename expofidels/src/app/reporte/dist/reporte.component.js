@@ -9,64 +9,82 @@ exports.__esModule = true;
 exports.ReporteComponent = void 0;
 var core_1 = require("@angular/core");
 var ReporteComponent = /** @class */ (function () {
-    function ReporteComponent() {
+    function ReporteComponent(dReport) {
+        this.dReport = dReport;
         this.arrCursor = [];
     }
     ReporteComponent.prototype.ngOnInit = function () {
-        this.dbRead('comprobant-db');
+        //this.dbRead('comprobant-db');  
+        this.getReport();
         var foot = document.getElementById('foot');
         this._footer = "Los\u00A0precios\u00A0de\u00A0la\u00A0siguiente\u00A0Cotizaci\u00F3n\u00A0estan\u00A0sujetos\u00A0a\u00A0cambio\u00A0sin\u00A0previo\u00A0aviso\n                    Matriz:\u00A0Chile\u00A01810/12\u00A0y\u00A0Gomez\u00A0Rendon\u00A0\u00A0 Telefono:\u00A02414-732\u00A0-\u00A0\u00A02414-775 Email:\u00A0Ventas@ibea.com.ec\u00A0\n                    Sucursal:\u00A0Urdesa\u00A0Central\u00A0Av.\u00A0Jorge\u00A0Perez\u00A0Concha\u00A0321\u00A0y\u00A0calle\u00A0diagonal Telefono:\u00A06007373\u00A0-\u00A02386121\n                    Email:\u00A0Infosucursal@ibea.com.ec\u00A0-\u00A0rgarcia@ibeasa.co";
     };
-    ReporteComponent.prototype.dbRead = function (bd) {
-        var _this = this;
-        //console.log('leyendo data cabecera');
-        var db;
-        var request = indexedDB.open(bd, 1);
-        request.onerror = function (error) { return console.log(error); };
-        var v = document.getElementById('tbody-arr');
-        //funcion capta los requirimientos positivos de mis transacciones
-        request.onsuccess = function (e) {
-            db = request.result;
-            var transaction = db.transaction([bd], 'readwrite');
-            var objectStore = transaction.objectStore(bd);
-            objectStore.openCursor().onsuccess = function (e) {
-                var cursor = e.target.result;
-                if (cursor) {
-                    _this.arrCursor.push(cursor.value);
-                    cursor["continue"]();
-                    console.log(_this.arrCursor);
-                    for (var i = 0; i <= _this.arrCursor.length; i++) {
-                        //---------------------------------------------------------------
-                        //bucle para recorre la cabecera
-                        _this._n_reporte = " #" + (_this.arrCursor[i][0].tipo + _this.arrCursor[i][0].numero);
-                        _this._cliente = _this.arrCursor[i][0].empcli;
-                        _this._direccion = _this.arrCursor[i][0].direccion;
-                        _this._bodega = _this.arrCursor[i][0].bodega;
-                        _this._concepto = _this.arrCursor[i][0].comenta;
-                        _this._ruc = _this.arrCursor[i][0].ruc;
-                        _this._telefono = _this.arrCursor[i][0].fono1;
-                        _this._emision = _this.arrCursor[i][0].fechA_TRA;
-                        _this._f_vencimiento = _this.arrCursor[i][0].fecha_ven;
-                        //---------------------------------------------------------------
-                        //bucle para recorrer el detalle
-                        for (var f = 0; f <= _this.arrCursor[i].length; f++) {
-                            var create_tr = document.createElement('tr');
-                            var create_td = document.createElement('td');
-                            var ctr = v.appendChild(create_tr);
-                            _this.sumCantidad = Number(_this.arrCursor[i][f].cantidad);
-                            ctr.innerHTML = "<td style='font-size: 8pt;'>\n                                " + _this.arrCursor[i][f].nombre + "\n                               </td>\n                               <td style='font-size: 8pt;'>\n                                " + _this.arrCursor[i][f].cantidad + "\n                               </td>\n                               <td style='font-size: 8pt;'>\n                                " + _this.arrCursor[i][f].despacho + "\n                               </td>\n                               <td style='font-size: 8pt;'>\n                                " + (_this.arrCursor[i][f].cantidad
-                                - _this.arrCursor[i][f].despacho) + "\n                               </td> ";
-                        }
-                    }
-                }
-            };
-        };
-        request.onupgradeneeded = function () {
-            db = request.result;
-            db.createObjectStore(bd, {
-                autoIncrement: true
-            });
-        };
+    // dbRead(bd) {
+    //   //console.log('leyendo data cabecera');
+    //   var db;
+    //   const request = indexedDB.open(bd, 1); 
+    //   request.onerror = (error) => console.log(error);
+    //   let v = document.getElementById('tbody-arr');    
+    //   //funcion capta los requirimientos positivos de mis transacciones
+    //   request.onsuccess = (e) => {
+    //     db = request.result;
+    //     const transaction =  db.transaction([bd], 'readwrite');
+    //     const objectStore = transaction.objectStore(bd);
+    //     objectStore.openCursor().onsuccess = (e) => {        
+    //       const cursor = e.target.result; 
+    //       if( cursor ) {        
+    //         this.arrCursor.push(cursor.value);
+    //         cursor.continue();
+    //         console.log(this.arrCursor);          
+    // for(let i = 0; i <= this.arrCursor.length; i++ ) {
+    //   //---------------------------------------------------------------
+    //   //bucle para recorre la cabecera
+    //   this._n_reporte = ` #${this.arrCursor[i][0].tipo + this.arrCursor[i][0].numero}`; 
+    //   this._cliente   = this.arrCursor[i][0].empcli;
+    //   this._direccion = this.arrCursor[i][0].direccion;
+    //   this._bodega    = this.arrCursor[i][0].bodega;
+    //   this._concepto  = this.arrCursor[i][0].comenta;
+    //   this._ruc       = this.arrCursor[i][0].ruc;
+    //   this._telefono  = this.arrCursor[i][0].fono1;
+    //   this._emision   = this.arrCursor[i][0].fechA_TRA;
+    //   this._f_vencimiento   = this.arrCursor[i][0].fecha_ven;            
+    //   //---------------------------------------------------------------
+    //   //bucle para recorrer el detalle
+    //   for(let f = 0; f <= this.arrCursor[i].length; f++) {              
+    //     const create_tr = document.createElement('tr');
+    //     const create_td = document.createElement('td');               
+    //     let ctr = v.appendChild(create_tr);
+    //     this.sumCantidad = Number(this.arrCursor[i][f].cantidad);
+    //     ctr.innerHTML = `<td style='font-size: 8pt;'>
+    //                       ${this.arrCursor[i][f].nombre}
+    //                      </td>
+    //                      <td style='font-size: 8pt;'>
+    //                       ${this.arrCursor[i][f].cantidad}
+    //                      </td>
+    //                      <td style='font-size: 8pt;'>
+    //                       ${this.arrCursor[i][f].despacho}
+    //                      </td>
+    //                      <td style='font-size: 8pt;'>
+    //                       ${this.arrCursor[i][f].cantidad 
+    //                       - this.arrCursor[i][f].despacho }
+    //                      </td> `;
+    //   }
+    // }          
+    //       }
+    //     }
+    //   }
+    //   request.onupgradeneeded = () => {
+    //     db = request.result;
+    //     db.createObjectStore(bd, {
+    //       autoIncrement: true
+    //     });
+    //   }
+    // }
+    ReporteComponent.prototype.getReport = function () {
+        this.dReport.getExec(sessionStorage.getItem('Session-Key'), 'despacho')
+            .subscribe(function (report) {
+            console.log(report);
+        });
     };
     ReporteComponent = __decorate([
         core_1.Component({

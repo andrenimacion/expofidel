@@ -15,6 +15,10 @@ import { Observable } from 'rxjs';
 })
 export class ConsfacComponent implements OnInit {
 
+  //var report INICIO
+  public _reportBool: boolean = false;
+  //var report FIN
+
   public _searchFacts: string;
   public seesionToken = sessionStorage.getItem('Session-Key');
   public arrFacts: any = [];
@@ -40,7 +44,7 @@ export class ConsfacComponent implements OnInit {
   public typeGen: string;
   public arrCursorFact:any = [];
   
-  /* variables para transacciones */
+  /* ----------------------- variables para transacciones INICIO -------------------------------------------- */
   //#region 
   public arrCabSave: any = [];
   public arrDetSave: any = [];
@@ -48,15 +52,41 @@ export class ConsfacComponent implements OnInit {
   public Token = this.tGener.tGenerate(14);
   public dataOfflineDBRecovery: any = [];
   //#endregion
+  /* ----------------------- variables para transacciones FIN -------------------------------------------- */
+
+  //----------------------- variables para la reportería de despacho INICIO -----------------------------
+  //#region
+  
+  public _cliente: string;
+  public _direccion: string;
+  public _bodegaR: string;
+  public _concepto: string;
+  public _ruc: string;
+  public _telefono: string;
+  public _emision: string;
+  public _f_vencimiento: string;  
+  public _n_reporte: string;
+  public _footer;
+  public sumCantidad;
+  public sumDespacho;
+  //#endregion
+  //----------------------- variables para la reportería de despacho FIN -----------------------------
+
+
+  //observer VAR RXJS
+  public observable: any;
+  
 
   constructor( public dataFact: ControlprodService,
-    public iDB: IndexedDBService,
+               public iDB: IndexedDBService,
                private desSave: TInvcabgControllerService,
                public tGener: TokenGenerateService,
                public emServGen:EmailcontrolService  ) { }
 
   ngOnInit() {
     //this.execReport();
+    //this.deleteChilds('tbody-arr', document.getElementsByTagName('tr'));
+    this.removesecuenceLocalStorage(1000);
     this.getFactType('0', '50');
     this.datesNow();
     this.dbREAD('scanDB');
@@ -76,10 +106,16 @@ export class ConsfacComponent implements OnInit {
     
   }
 
-  createStructureDataTransac(data) {
-    this.iDB.createIndexedDB('transac-control-db', 1);
-    this.iDB.saveDataIndexedDB('transac-control-db', 1, data);
+  removesecuenceLocalStorage(numberSecuenceClean: number) {
+    for( let a = 0; a <= numberSecuenceClean; a++ ){
+      localStorage.removeItem(`cantsScann-${a}`);
+    }
   }
+
+  // createStructureDataTransac(data) {
+  //   this.iDB.createIndexedDB('transac-control-db', 1);
+  //   this.iDB.saveDataIndexedDB('transac-control-db', 1, data);
+  // }
 
 
   sliceNameFactF = (a, b) => {  
@@ -139,13 +175,12 @@ export class ConsfacComponent implements OnInit {
 
   }
 
-
   /* ------- GUARDAMOS LA CABECERA DE LA TRANSACCIÓN ------- */
   //#region 
   saveDespachos() {    
     sessionStorage.setItem('TRANSACCION-KEY', this.Token); 
     sessionStorage.removeItem('TOKEN');
-
+    
     this.arrCabSave = {
       T_llave: sessionStorage.getItem('Session-Key'),
       tempo: "despacho",
@@ -156,59 +191,67 @@ export class ConsfacComponent implements OnInit {
       referencia: this.sliceNameFact + this.sliceNameFactB
     }
 
+    console.log( this.arrCabSave );
+
     this.desSave.despachoSaveCab(this.arrCabSave).subscribe( scab => {     
-      this.dataFact.getfactura('_opt_', this.sliceNameFact, this.sliceNameFactB, 'V' ).subscribe( FACTS => {
-       
-        // Transaciiones generales
+      this.dataFact.getfactura('_opt_', this.sliceNameFact, this.sliceNameFactB, 'V' )
+                   .subscribe( FACTS => {
+        
+        // Transaciiones generales;
         this.arrFacts = FACTS;  
-        this.createStructureDataTransac(this.arrFacts);
-        this.exec();
+        // this.createStructureDataTransac(this.arrFacts);
 
-        /*Con este bucle recorremos el JSON de nuestra petición GET this.dataFact.getfactura(...)
-          para enviar el resultado mediante un POST hacia la base de datos... */
+        /*Con este bucle recorremos el JSON de nuestra
+         petición GET this.dataFact.getfactura(...)
+         para enviar el resultado mediante
+         un POST hacia la base de datos... */
         
-        for( let m = 0; m <= this.arrFacts.length; m++ ) {
-        
-          this.arrDetSave = {
+        //console.log(this.arrFacts);
 
-            T_llave:  sessionStorage.getItem('Session-Key'),
-            tempo:    "despacho",
-            linea:    this.arrFacts[m].linea,
-            no_parte: this.arrFacts[m].no_parte,
-            cantidad: this.arrFacts[m].cantidad
+        this.observable = new Observable(subscriber => {
+          subscriber.next(this.saveDespachos());
+          for( let m = 0; m <= this.arrFacts.length; m++ ) {
+            
+            this.arrDetSave = {
+              T_llave:  sessionStorage.getItem('Session-Key'),
+              tempo:    "despacho",
+              linea:    this.arrFacts[m].linea,
+              no_parte: this.arrFacts[m].no_parte,
+              cantidad: localStorage.getItem(`scann-${m}`)
+            }
 
+            subscriber.next(this.saveDetalle(this.arrDetSave));
+    
           }
-  
-          this.desSave.despachoSaveDet(this.arrDetSave).subscribe(
-            postDetail => {
-              console.log(postDetail);
-            }  
-          )        
-        }
+
+          subscriber.next(this.exec());
+          subscriber.complete();
+    
+        });
+
       }
+
     )
     }, (err) => {
-
-      Swal.fire(
-        '¿Problemas de conexión?',
-        'Hemos guardado tu transacción en base de datos local. Con este token: ' + this.Token,
-        'info'
-      )
+      console.log(err);
+      // Swal.fire(
+      //   '¿Problemas de conexión?',
+      //   'Hemos guardado tu transacción en base de datos local. Con este token: ' + this.Token,
+      //   'info'
+      // )
     })
     
   }
   //#endregion
 
-
-
-  /* -------CREAMOS UNA BASE DE DATOS LOCAL
-  DONDE GUARDAMOS LA CABECERA DE LA TRANSACCIÓN ------- */
-  // createRecoveryDBTransaccional(data) {
-  //   this.iDB.createIndexedDB('transaction-db', 1);
-  //   this.iDB.saveDataIndexedDB('transaction-db', 1, data);
-  // }
-
-
+  saveDetalle(content) {
+    this.desSave.despachoSaveDet(content).subscribe(
+      postDetail => {
+        console.log(postDetail);
+        this.removesecuenceLocalStorage(1000);
+      }
+    )
+  }
   
   getComprobantController(data) {
     this.iDB.createIndexedDB('comprobant-db', 1);
@@ -224,78 +267,107 @@ export class ConsfacComponent implements OnInit {
 
     this.desSave.getExec(this.seesionToken, 'despacho').subscribe( exec => {
       
-      this.arrExec = exec;
-      this.comproba = this.arrExec[0].comproba;
-      this.comprobaA = this.comproba.slice(0,2);
-      this.comprobaB = this.comproba.slice(2,10);
-      localStorage.setItem('Comprobante-type', this.comprobaA);
-      localStorage.setItem('Comprobante-number', this.comprobaB);
-      console.log(this.comproba);
-    
+      this.arrCursor = exec;
+      console.log(this.arrExec);
+      this._reportBool = true;
+      const v = document.getElementById('tbody-arr');  
+      for(let i = 0; i <= this.arrCursor.length; i++ ) {
+        //---------------------------------------------------------------
+        //bucle para recorre la cabecera
+        this._n_reporte = ` #${this.arrCursor[i][0].tipo + this.arrCursor[i][0].numero}`; 
+        this._cliente   = this.arrCursor[i][0].empcli;
+        this._direccion = this.arrCursor[i][0].direccion;
+        this._bodega    = this.arrCursor[i][0].bodega;
+        this._concepto  = this.arrCursor[i][0].comenta;
+        this._ruc       = this.arrCursor[i][0].ruc;
+        this._telefono  = this.arrCursor[i][0].fono1;
+        this._emision   = this.arrCursor[i][0].fechA_TRA;
+        this._f_vencimiento   = this.arrCursor[i][0].fecha_ven;            
+        //---------------------------------------------------------------
+        //bucle para recorrer el detalle
+        for(let f = 0; f <= this.arrCursor[i].length; f++) {              
+          const create_tr = document.createElement('tr');
+          //const create_td = document.createElement('td');
+          let ctr = v.appendChild(create_tr);
+          this.sumCantidad = Number(this.arrCursor[i][f].cantidad);
+          ctr.innerHTML = `<td style='font-size: 8pt;'>
+                            ${this.arrCursor[i][f].nombre}
+                           </td>
+                           <td style='font-size: 8pt;'>
+                            ${this.arrCursor[i][f].cantidad}
+                           </td>
+                           <td style='font-size: 8pt;'>
+                            ${this.arrCursor[i][f].despacho}
+                           </td>
+                           <td style='font-size: 8pt;'>
+                            ${this.arrCursor[i][f].cantidad 
+                            - this.arrCursor[i][f].despacho }
+                           </td> `;
+        }
+      } 
     })
   }
 
-  public exeReportArr: any = [];
-  execReport() {    
-    this.desSave.getExecReport(localStorage.getItem('Comprobante-type'), localStorage.getItem('Comprobante-number')).subscribe (execr => {
+  // public exeReportArr: any = [];
+  // execReport() {    
 
-      this.exeReportArr = execr;
-      this.getComprobantController(this.exeReportArr);
-      console.log(this.exeReportArr);
+  //   // console.log(localStorage.getItem('Comprobante-type'), localStorage.getItem('Comprobante-number'));
 
-    })
-  } 
+  //   this.desSave.getExecReport(sessionStorage.getItem('Session-Key'), 'despacho').subscribe (execr => {
 
+  //     this.exeReportArr = execr;
+  //     //this.getComprobantController(this.exeReportArr);
+  //     console.log(this.exeReportArr);
 
+  //   })
+  // } 
 
-  public observable: any;
   //this.exec(sessionStorage.getItem('Session-Key'), 'despacho')
-  controlSaveDataObserver() {
+  // controlSaveDataObserver() {
   
-    this.observable = new Observable(subscriber => {
-      subscriber.next(this.saveDespachos());
-      subscriber.next(this.execReport());
-      subscriber.complete();
-    });
-  
-    this.rxjsFunction();
-  
-  }
+  //   this.observable = new Observable(subscriber => {
+  //     subscriber.next(this.saveDespachos());
+  //     subscriber.complete();
 
+  //   });
+  
+  //   this.rxjsFunction();
+  
+  // }
 
-  rxjsFunction() {
+  // rxjsFunction() {
     
-    this.observable.subscribe({
-      next(x) { x },
-      error(err) { console.error('something wrong occurred: ' + err); },
-      complete() { 
-
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-start',
-          showConfirmButton: false,
-          timer: 5000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        })
+  //   this.observable.subscribe({
+  //     next(x) { x },
+  //     error(err) { console.error('Ha ocurrido un error de ejecución: ' + err); },
+  //     complete() {
         
-        Toast.fire({
-          icon: 'success',
-          html: `Transacción guardada exitosamente
-                 con token:<strong>${sessionStorage.getItem('Session-Key')}</strong>`
-                })
+  //       const Toast = Swal.mixin({
+  //         toast: true,
+  //         position: 'top-start',
+  //         showConfirmButton: false,
+  //         timer: 5000,
+  //         timerProgressBar: true,
+  //         didOpen: (toast) => {
+  //           toast.addEventListener('mouseenter', Swal.stopTimer)
+  //           toast.addEventListener('mouseleave', Swal.resumeTimer)
+  //         }
+  //       })
+        
+  //       Toast.fire({
+  //         icon: 'success',
+  //         html: `Transacción guardada exitosamente
+  //                con token:<strong>${sessionStorage.getItem('Session-Key')}</strong>`
+  //               })
 
-       }
+  //      }
 
-      });
+  //     });
       
-    }
+  // }
     
-public _value: any = 0; 
-valdeteScann() {    
+  public _value: any = 0; 
+  valdeteScann() {    
     // localStorage.setItem('p_diferen', a);
     //this.total = localStorage.getItem('p_diferen');
     
@@ -338,54 +410,124 @@ valdeteScann() {
                 
                 // }
                 
-              }
+  }
               
               
-              getFactsUnit( type, top ) {
-                this.dataFact.getfacttype(type, top).subscribe( typef => {
-                  this.arrFactsType = typef;
-                  console.log(this.arrFactsType);
-                }, (err)=> {      
-                  Swal.fire({
-                    
-                    title: 'No se pudo concretar tu busqueda',
-                    showClass: {
-                      popup: 'animate__animated animate__fadeInDown'
-                    },
-                    
-                    hideClass: {
-                      popup: 'animate__animated animate__fadeOutUp'
-                    }
-                    
-                  })
-                })
-              }
-              
-              /*  OBTIENE LA CABECERA Y DETALLE DE LA FACTURA A SELECCIONAR */
-              //#region
-              
+  getFactsUnit( type, top ) {
+    this.dataFact.getfacttype(type, top).subscribe( typef => {
+      this.arrFactsType = typef;
+      console.log(this.arrFactsType);
+    }, (err)=> {      
+      Swal.fire({
+        
+        title: 'No se pudo concretar tu busqueda',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+        
+      })
+    })
+  }
+  
+  /*  OBTIENE LA CABECERA Y DETALLE DE LA FACTURA A SELECCIONAR */
+  //#region
+  
   getFacts(a,b,c,d) {
+    let v = document.getElementById('tbody-arr');
     //let z = <HTMLInputElement> document.getElementById('scann');
     this.dataFact.getfactura(a,b,c,d).subscribe( FACTS => {
       this.arrFacts = FACTS;
-      // esto es las transaciiones generales
-      this.createStructureDataTransac(this.arrFacts);
-      this.scaningQR = 0;
-      //z.disabled = false;
-      
-      for( let k = 0; k < this.arrFacts.length; k++ ) {
-        console.log('funcionando');
-        
-          this._bodega = this.arrFacts[k].bodega;          
-          localStorage.setItem(`cantidad-${k}`, this.arrFacts[k].cantidad);
-          //localStorage.setItem(`diferencia-${k}`, this.arrFacts[k].cantidad);
+      console.log(this.arrFacts);
 
-        }
+      //variables para localstorage
+      
+      localStorage.setItem('bodega', this.arrFacts[0].bodega);
+      this._bodega = localStorage.getItem('bodega');
+
+      //this.createStructureDataTransac(this.arrFacts);
+      this.scaningQR = 0;
+
+      for(let f = 0; f <= this.arrFacts.length; f++) {
+        
+        const create_tr = document.createElement('tr');
+        //const create_td = document.createElement('td'); 
+        
+        let ctr = v.appendChild(create_tr);
+        //this.sumCantidad = Number(this.arrCursor[i][f].cantidad);
+        let opertoral;
+        const operMath = ( op1, op2 ) => {
+          opertoral = op1 - op2;
+          console.log(opertoral);
+          return opertoral;
+        }        
+        
+        ctr.innerHTML = `<td style='font-size: 8pt;'>
+        ${this.arrFacts[f].no_parte}
+        </td>
+        <td style='font-size: 8pt;'>
+        ${this.arrFacts[f].nomParte}
+        </td>
+        <td style='font-size: 8pt;'>
+        ${this.arrFacts[f].cantidad}
+        </td>
+        <td style='font-size: 8pt;'>
+        <input type="number" id="idInput-${f}" style="color: gray !important;" >
+        </td>
+        <td style='font-size: 8pt;'>
+          <span id="sp-${f}" ></span>
+        </td>`;
+
+        //EVENTOS CREADOS PARA LA TABLA
+        //#region addeventlisteners
+        let bID = <HTMLInputElement> document.getElementById(`idInput-${f}`);
+
+        this.cotrolEventListeners(`idInput-${f}`, `sp-${f}`, 'change', this.arrFacts[f].cantidad, f);
+        this.cotrolEventListeners(`idInput-${f}`, `sp-${f}`, 'click',  this.arrFacts[f].cantidad, f);
+        this.cotrolEventListeners(`idInput-${f}`, `sp-${f}`, 'keyup',  this.arrFacts[f].cantidad, f);        
+
+        //#endregion
+        
+        
+
+      }
 
     }, (err) => {
 
       console.log('No encontro la informacion' + err);
     
+    })
+  }
+
+  deleteChilds(objectID, removeObject) {
+    document.getElementById(objectID).removeChild(removeObject);
+  }
+
+  cotrolEventListeners(objectID, spanID, EVENT, valueB, secuence) {
+    const valueID = <HTMLInputElement> document.getElementById(objectID);
+    const sID = <HTMLInputElement> document.getElementById(spanID);
+    valueID.addEventListener( EVENT, () => {
+      if( Number(valueID.value) > valueB ) {
+        //valueID.disabled = true;
+        valueID.style.border = 'solid 1px yellowgreen';
+        sID.innerText = '0';
+        valueID.value = valueB;
+        localStorage.setItem(`cantsScann-${secuence}`, valueB);
+        Swal.fire({
+          icon: 'error',
+          title: 'Hey',
+          text: 'Has llegado al límite!"'
+        })
+      }
+      else {
+        //valueID.disabled = false;
+        sID.innerText = (valueB - Number(valueID.value)).toString();
+        localStorage.setItem(`cantsScann-${secuence}`, (valueB - Number(valueID.value)).toString())
+        localStorage.setItem(`scann-${secuence}`, (Number(valueID.value)).toString())
+      }
     })
   }
 
@@ -397,6 +539,7 @@ valdeteScann() {
     })
 
   }
+
 
 
 }

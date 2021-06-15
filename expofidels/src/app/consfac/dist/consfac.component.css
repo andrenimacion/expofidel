@@ -1,0 +1,15 @@
+.td {
+  padding-top: 10px;
+}
+.mat-form-field-label {
+  color: #000 !important;
+}
+.menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.repFinalTransacDesp {
+  background-color: #f5f5f5;
+}
