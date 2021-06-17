@@ -166,13 +166,13 @@ export class EmailcontrollerComponent implements OnInit {
 
   
 
-  sendMailRecover(a,b,c) {  
+  sendMailRecover(a,b,c,d) {  
       
       this.arrMail = {
         txtPara:      a,
         txtAsunto:    c,
         txtCopia:     b,
-        txtMensaje:   this.messageComplete,
+        txtMensaje:   d,
         MailAddress:  "syscompsasa@gmail.com",
         passwordMail: "sysgye2016",
         date_send_mail: new Date()
@@ -183,7 +183,13 @@ export class EmailcontrollerComponent implements OnInit {
       this.eSend.SendMailJson(this.arrMail).subscribe( sendMail => {
           console.log(sendMail)
       }, (err) => {
-          alert('No se ha podido enviar el email, revisar bien los permisos');
+          // alert('No se ha podido enviar el email, revisar bien los permisos');
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'No se envio el correo electrónico!',
+            footer: 'Revisa tu conexión o la configuración de tu correo.'
+          })
       })
   }
 }

@@ -49,29 +49,3 @@ export class IndexedDBService {
 
 }
 
-
-
-
-
-// public arrCursor:any = [];
-// dbFun(data) {
-//   var db;
-//   const request = indexedDB.open('register-scann', 1);
-//   request.onerror = (error) => console.log(error)
-//   request.onsuccess = (e) => {
-
-//   db = request.result;
-//     const transaction =  db.transaction(['register-scann'], 'readwrite');
-//     const objectStore =  transaction.objectStore('register-scann');
-//     let r = objectStore.add(data);
-//   }
-
-//   request.onupgradeneeded = () =>{  
-//     db = request.result;
-//     const objectStore = db.createObjectStore('register-scann', {
-//       autoIncrement: true,
-//       // keyPath: 'con'
-//     });
-//   }
-  
-// }

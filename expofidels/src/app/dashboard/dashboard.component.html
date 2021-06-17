@@ -4,9 +4,7 @@
 
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
         <mat-icon>chevron_right  </mat-icon>
-    </button>
-
-    
+    </button>   
 
     <div class="offcanvas offcanvas-start" style="overflow-y: auto !important;" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
         <div class="offcanvas-header">
@@ -76,14 +74,22 @@
         
         <mat-tab-group mat-align-tabs="end">
             
-            <mat-tab label="Control de productos">
+            <mat-tab label="Control de empaque">
                 <div class="dashApps container-fluid"
                      [ngStyle]="{'height': heightApps + 'px'}" >
                      
-                    <app-consfac></app-consfac>
+                    <app-controlempaque></app-controlempaque>
 
                 </div>
             </mat-tab>
+            <mat-tab label="Control de productos">
+              <div class="dashApps container-fluid"
+                   [ngStyle]="{'height': heightApps + 'px'}" >
+                   
+                  <app-consfac></app-consfac>
+
+              </div>
+          </mat-tab>
 
             <mat-tab class="icon-qr-code"
                      label="Scanner QR" >

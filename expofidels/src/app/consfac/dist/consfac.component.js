@@ -9,20 +9,25 @@ exports.__esModule = true;
 exports.ConsfacComponent = void 0;
 var core_1 = require("@angular/core");
 var sweetalert2_1 = require("sweetalert2");
-var rxjs_1 = require("rxjs");
+var http_1 = require("@angular/common/http");
 var ConsfacComponent = /** @class */ (function () {
-    function ConsfacComponent(dataFact, iDB, desSave, tGener, emServGen) {
+    function ConsfacComponent(dataFact, iDB, desSave, tGener, emServGen, emailReport) {
         var _this = this;
         this.dataFact = dataFact;
         this.iDB = iDB;
         this.desSave = desSave;
         this.tGener = tGener;
         this.emServGen = emServGen;
+        this.emailReport = emailReport;
+        //foter INICIO
+        this._footer = "POFIDEL - ";
+        //foter FIN
         //var report INICIO
         this._reportBool = false;
         this.seesionToken = sessionStorage.getItem('Session-Key');
         this.arrFacts = [];
         this.arrFactsType = [];
+        this._dateNow = new Date();
         this.arrCursorFact = [];
         /* ----------------------- variables para transacciones INICIO -------------------------------------------- */
         //#region 
@@ -31,10 +36,6 @@ var ConsfacComponent = /** @class */ (function () {
         this.em = [];
         this.Token = this.tGener.tGenerate(14);
         this.dataOfflineDBRecovery = [];
-        // createStructureDataTransac(data) {
-        //   this.iDB.createIndexedDB('transac-control-db', 1);
-        //   this.iDB.saveDataIndexedDB('transac-control-db', 1, data);
-        // }
         this.sliceNameFactF = function (a, b) {
             _this.sliceNameFact = a.slice(0, 2);
             _this._typ = _this.sliceNameFact;
@@ -46,6 +47,7 @@ var ConsfacComponent = /** @class */ (function () {
             _this.getFacts('_opt_', _this.sliceNameFact, _this.sliceNameFactB, 'V');
         };
         this.arrCursor = [];
+        this.arrMailSendJSON = [];
         this.arrExec = [];
         // public exeReportArr: any = [];
         // execReport() {    
@@ -92,34 +94,52 @@ var ConsfacComponent = /** @class */ (function () {
     }
     ConsfacComponent.prototype.ngOnInit = function () {
         var _this = this;
-        //this.execReport();
-        //this.deleteChilds('tbody-arr', document.getElementsByTagName('tr'));
         this.removesecuenceLocalStorage(1000);
         this.getFactType('0', '50');
-        this.datesNow();
+        //this.datesNow();
         this.dbREAD('scanDB');
         this.scaningQR = Number(localStorage.getItem('scann_number'));
         this._bodega = localStorage.getItem('bodega');
         this._typ = localStorage.getItem('tipo');
         this._options = localStorage.getItem('factura_number');
         this._name = localStorage.getItem('nomCliente');
+        //var tbodyRes = document.getElementById('tbody-arr');
+        //console.log(tbodyRes);
         this.emServGen.getEmail().subscribe(function (email) {
             _this.em = email;
             _this.typeGen = email[0].tipoDespa_web;
             sessionStorage.setItem('Tipo', _this.typeGen);
         }, function (err) { });
     };
+    ConsfacComponent.prototype.resize = function (a, b, c, height) {
+        var ziner = document.getElementById(a);
+        ziner.style.width = "" + b + c;
+        ziner.style.top = '0px';
+        ziner.style.left = '0px';
+        if (height == 0) {
+            ziner.style.height = screen.height + 'px';
+        }
+        else {
+            ziner.style.height = height + 'px';
+        }
+    };
+    ConsfacComponent.prototype.close = function () {
+        var tbodyReport = document.getElementById('domtab');
+        var exbox = document.getElementById('exbox');
+        //this._reportBool = false;
+        exbox.style.display = 'none';
+        for (var m = 0; m < 2000; m++) {
+            var atr = document.getElementById("trTabReport-" + m);
+            tbodyReport.removeChild(atr);
+        }
+        setTimeout(function () {
+            location.reload();
+        }, 1000);
+    };
     ConsfacComponent.prototype.removesecuenceLocalStorage = function (numberSecuenceClean) {
         for (var a = 0; a <= numberSecuenceClean; a++) {
             localStorage.removeItem("cantsScann-" + a);
         }
-    };
-    ConsfacComponent.prototype.datesNow = function () {
-        var fecha = new Date();
-        var year = fecha.getFullYear();
-        var day = fecha.getDay();
-        var month = fecha.getMonth();
-        return this._dateNow = month + "/" + day + "/" + year;
     };
     ConsfacComponent.prototype.dbREAD = function (bd) {
         var _this = this;
@@ -164,41 +184,42 @@ var ConsfacComponent = /** @class */ (function () {
             usercla: sessionStorage.getItem('Token-User'),
             referencia: this.sliceNameFact + this.sliceNameFactB
         };
-        console.log(this.arrCabSave);
         this.desSave.despachoSaveCab(this.arrCabSave).subscribe(function (scab) {
-            _this.dataFact.getfactura('_opt_', _this.sliceNameFact, _this.sliceNameFactB, 'V')
-                .subscribe(function (FACTS) {
-                // Transaciiones generales;
-                _this.arrFacts = FACTS;
-                // this.createStructureDataTransac(this.arrFacts);
-                /*Con este bucle recorremos el JSON de nuestra
-                 petición GET this.dataFact.getfactura(...)
-                 para enviar el resultado mediante
-                 un POST hacia la base de datos... */
-                //console.log(this.arrFacts);
-                _this.observable = new rxjs_1.Observable(function (subscriber) {
-                    subscriber.next(_this.saveDespachos());
-                    for (var m = 0; m <= _this.arrFacts.length; m++) {
-                        _this.arrDetSave = {
-                            T_llave: sessionStorage.getItem('Session-Key'),
-                            tempo: "despacho",
-                            linea: _this.arrFacts[m].linea,
-                            no_parte: _this.arrFacts[m].no_parte,
-                            cantidad: localStorage.getItem("scann-" + m)
-                        };
-                        subscriber.next(_this.saveDetalle(_this.arrDetSave));
-                    }
-                    subscriber.next(_this.exec());
-                    subscriber.complete();
-                });
-            });
+            if (scab.type == http_1.HttpEventType.UploadProgress) {
+                _this.upload = scab.loaded / 1000000;
+                _this.uploadTotal = scab.total / 1000000; //total bytes to upload
+                _this.porcentUploadTotal = (_this.upload / _this.uploadTotal) * 100;
+                console.log(_this.porcentUploadTotal + '...%');
+                //document.getElementById('pBar').style.width = this.porcentUploadTotal + '%';
+            }
+            console.log(scab);
+            console.log(_this.arrFacts);
+            if (scab.type === http_1.HttpEventType.Response) {
+                for (var v_1 = 0; v_1 < _this.arrFacts.length; v_1++) {
+                    _this.arrDetSave = {
+                        T_llave: sessionStorage.getItem('Session-Key'),
+                        tempo: "despacho",
+                        linea: _this.arrFacts[v_1].linea,
+                        no_parte: _this.arrFacts[v_1].no_parte,
+                        cantidad: localStorage.getItem("scann-" + v_1)
+                    };
+                    _this.saveDetalle(_this.arrDetSave);
+                    //console.log(this.arrDetSave);
+                }
+                setTimeout(function () {
+                    console.log('EXEC');
+                    _this.exec();
+                }, 1500);
+            }
+            var v = document.getElementById('tbody-arr');
+            setTimeout(function () {
+                for (var y = 0; y < 2000; y++) {
+                    var atr = document.getElementById("trPrincipal" + y);
+                    v.removeChild(atr);
+                }
+            }, 1500);
         }, function (err) {
             console.log(err);
-            // Swal.fire(
-            //   '¿Problemas de conexión?',
-            //   'Hemos guardado tu transacción en base de datos local. Con este token: ' + this.Token,
-            //   'info'
-            // )
         });
     };
     //#endregion
@@ -207,6 +228,34 @@ var ConsfacComponent = /** @class */ (function () {
         this.desSave.despachoSaveDet(content).subscribe(function (postDetail) {
             console.log(postDetail);
             _this.removesecuenceLocalStorage(1000);
+            _this._reportBool = true;
+        });
+    };
+    ConsfacComponent.prototype.sendMail = function () {
+        var tbodyReport = document.getElementById('domtab').outerHTML;
+        this.arrMailSendJSON = {
+            txtPara: "andrenimacion@gmail.com",
+            txtAsunto: "Reporte de despacho: " + this._n_reporte + " ",
+            txtCopia: "syscompsasa@gmail.com",
+            txtMensaje: "<div style=\"padding: 15px; border: solid 2px gray; \n                    border-top-right-radius: 5px; border-top-left-radius: 5px;\">\n                      <div>\n                        <div> <strong> Reporte de despacho: </strong> " + this._n_reporte + " </div>\n                        <div> <strong> Cliente: </strong> " + this._cliente + " </div><hr>\n                      </div>\n                      <div>\n                        <div> <strong> Direcci\u00F3n: </strong> " + this._direccion + "</div>\n                        <div> <strong> Bodega: </strong> " + this._bodega + " </div><hr>\n                      </div>\n                      <div>\n                        <div> <strong> Concepto: </strong> " + this._concepto + "</div>\n                        <div> <strong> R.U.C.: </strong> " + this._ruc + " </div><hr>\n                      </div>\n                      <div>\n                        <div> <strong> Telefono: </strong> " + this._telefono + "</div>\n                        <div> <strong> Emision: </strong> " + this._emision + "</div><hr>\n                      </div>                      \n                    </div>\n                    <hr>\n                    <div>\n                    <table style=\"width: 100%;\">\n                    <thead style='background-color: #444; color: white;'>\n                    <th>Detalle</th>\n                    <th>Cantidad</th>\n                    <th>Despachado</th>\n                    <th>Total</th>\n                    </thead>\n                    <tbody style='background-color: #FAC193;'>\n                      " + tbodyReport + "\n                    </tbody>\n                    </table>\n                    <hr style=\"border: dotted 2px gray;\">\n                    Fecha de vencimiento: " + this._f_vencimiento + "\n                    <h5><strong> POFIDEL - " + new Date() + " - ECUADOR </strong></h5>\n                    <strong>Nota:</strong> No responder este email...\n                   </div>",
+            MailAddress: "syscompsasa@gmail.com",
+            passwordMail: "sysgye2016",
+            date_send_mail: new Date()
+        };
+        console.log(this.arrMailSendJSON);
+        this.emailReport.SendMailJson(this.arrMailSendJSON).subscribe(function (mail) {
+            console.log(mail);
+            sweetalert2_1["default"].fire({
+                icon: 'success',
+                title: 'Oops...',
+                text: 'Se ha enviado el correo electrónico, con éxito!'
+            });
+        }, function () {
+            sweetalert2_1["default"].fire({
+                icon: 'success',
+                title: 'Bien...',
+                text: 'Se ha enviado el correo electrónico, con éxito!'
+            });
         });
     };
     ConsfacComponent.prototype.getComprobantController = function (data) {
@@ -217,31 +266,27 @@ var ConsfacComponent = /** @class */ (function () {
         var _this = this;
         this.desSave.getExec(this.seesionToken, 'despacho').subscribe(function (exec) {
             _this.arrCursor = exec;
-            console.log(_this.arrExec);
-            _this._reportBool = true;
-            var v = document.getElementById('tbody-arr');
+            // console.log(this.arrCursor);
             for (var i = 0; i <= _this.arrCursor.length; i++) {
                 //---------------------------------------------------------------
                 //bucle para recorre la cabecera
-                _this._n_reporte = " #" + (_this.arrCursor[i][0].tipo + _this.arrCursor[i][0].numero);
-                _this._cliente = _this.arrCursor[i][0].empcli;
-                _this._direccion = _this.arrCursor[i][0].direccion;
-                _this._bodega = _this.arrCursor[i][0].bodega;
-                _this._concepto = _this.arrCursor[i][0].comenta;
-                _this._ruc = _this.arrCursor[i][0].ruc;
-                _this._telefono = _this.arrCursor[i][0].fono1;
-                _this._emision = _this.arrCursor[i][0].fechA_TRA;
-                _this._f_vencimiento = _this.arrCursor[i][0].fecha_ven;
+                _this._n_reporte = " #" + (_this.arrCursor[i].tipo + _this.arrCursor[i].numero);
+                _this._cliente = _this.arrCursor[i].empcli;
+                _this._direccion = _this.arrCursor[i].direccion;
+                _this._bodega = _this.arrCursor[i].bodega;
+                _this._concepto = _this.arrCursor[i].comenta;
+                _this._ruc = _this.arrCursor[i].ruc;
+                _this._telefono = _this.arrCursor[i].fono1;
+                _this._emision = _this.arrCursor[i].fechA_TRA;
+                _this._f_vencimiento = _this.arrCursor[i].fecha_ven;
                 //---------------------------------------------------------------
-                //bucle para recorrer el detalle
-                for (var f = 0; f <= _this.arrCursor[i].length; f++) {
-                    var create_tr = document.createElement('tr');
-                    //const create_td = document.createElement('td');
-                    var ctr = v.appendChild(create_tr);
-                    _this.sumCantidad = Number(_this.arrCursor[i][f].cantidad);
-                    ctr.innerHTML = "<td style='font-size: 8pt;'>\n                            " + _this.arrCursor[i][f].nombre + "\n                           </td>\n                           <td style='font-size: 8pt;'>\n                            " + _this.arrCursor[i][f].cantidad + "\n                           </td>\n                           <td style='font-size: 8pt;'>\n                            " + _this.arrCursor[i][f].despacho + "\n                           </td>\n                           <td style='font-size: 8pt;'>\n                            " + (_this.arrCursor[i][f].cantidad
-                        - _this.arrCursor[i][f].despacho) + "\n                           </td> ";
-                }
+                //Creamos la tabla y la insertamos como HTML
+                var tbodyReport = document.getElementById('domtab');
+                var create_tr = document.createElement('tr');
+                var ctr = tbodyReport.appendChild(create_tr);
+                create_tr.setAttribute('id', "trTabReport-" + i);
+                _this.tableSend = "<td style='font-size: 8pt;'>\n                              " + _this.arrCursor[i].nombre + "\n                           </td>\n                           <td style='font-size: 8pt;'>\n                              " + _this.arrCursor[i].cantidad + "\n                           </td>\n                           <td style='font-size: 8pt;'>\n                              " + _this.arrCursor[i].despacho + "\n                           </td>\n                           <td style='font-size: 8pt;'>\n                              " + (_this.arrCursor[i].cantidad - _this.arrCursor[i].despacho) + "\n                           </td>";
+                ctr.innerHTML = _this.tableSend;
             }
         });
     };
@@ -299,6 +344,7 @@ var ConsfacComponent = /** @class */ (function () {
     //#region
     ConsfacComponent.prototype.getFacts = function (a, b, c, d) {
         var _this = this;
+        //const tbodyReport = document.getElementById('domtab');
         var v = document.getElementById('tbody-arr');
         //let z = <HTMLInputElement> document.getElementById('scann');
         this.dataFact.getfactura(a, b, c, d).subscribe(function (FACTS) {
@@ -312,6 +358,7 @@ var ConsfacComponent = /** @class */ (function () {
             var _loop_1 = function (f) {
                 var create_tr = document.createElement('tr');
                 //const create_td = document.createElement('td'); 
+                create_tr.setAttribute('id', "trPrincipal" + f);
                 var ctr = v.appendChild(create_tr);
                 //this.sumCantidad = Number(this.arrCursor[i][f].cantidad);
                 var opertoral;

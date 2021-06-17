@@ -49,41 +49,34 @@
     <input matInput disabled placeholder="cliente..."
            [(ngModel)]="_name" >
   </mat-form-field>
-
-  <!-- <mat-form-field class="example-full-width" appearance="fill">
-    <mat-label>fecha:</mat-label>
-    <input matInput [matDatepicker]="picker" [(ngModel)]="_dateNow" >
-    <mat-datepicker-toggle matSuffix [for]="picker">
-      <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
-    </mat-datepicker-toggle>
-    <mat-datepicker #picker></mat-datepicker>
-  </mat-form-field> -->
 </div>
 
 <div class="tableinfo">
-  <div class="btnSets">
     
-    <!-- <button class="btn btn-info">
-      Guardar
-    </button>
-    <button class="btn btn-info">
-      Limpiar
-    </button> -->
+    <!-- <strong>Cargando datos: </strong> {{upload | number:'1.1-2' }} mb - 
+    <strong> Total de carga:</strong> {{uploadTotal | number:'1.1-2'}} mb 
+    <strong> %. </strong> {{porcentUploadTotal | number:'1.1-2'}} -->
+    
+    <!-- <div class="container-fluid progress">
+      <div class="progress-bar " 
+           role="progressbar"
+           aria-valuemin="0" aria-valuemax="100">
+           {{porcentUploadTotal | number:'1.1-2'}} %
+      </div>
+    </div> -->
 
-    <button (click)="controlSaveDataObserver()" style="border-radius: 0px !important; font-size: 8pt !important;" mat-raised-button color="accent">
-      <!-- <mat-icon>send</mat-icon> -->
+  <div class="btnSets">
+
+    <button (click)="saveDespachos()"
+            style="border-radius: 0px !important; font-size: 8pt !important;"
+            mat-raised-button color="accent">
+
        <mat-icon>double_arrow</mat-icon> Guardar
+
     </button>
-    <!-- <button (click)="" class="btn btn-info" >
-      Obtener comprobante
-    </button> -->
 
   </div>
-    <!--<button class="btn btn-secondary" 
-          (click)="deleteBD('register-scann', 'register-scanns')" >
-              Borrar base de datos.
-        </button>-->
-    
+ 
     <table class="table table-striped table hover">
         <thead class="table-dark">
             <tr>
@@ -95,77 +88,81 @@
             </tr>
           </thead>
           <tbody id="tbody-arr">
-
-            
-
-            <!-- <tr *ngFor=" let factSArr of arrFacts ">
-              <td class="td">{{factSArr.no_parte}}</td>
-              <td class="td">{{factSArr.nomParte}}</td>
-              <td class="td">{{factSArr.cantidad}}</td>
-              <td style="width: 65px;" >
-
-                <input style="color: gray !important;"
-                       (change)="valdeteScann()"
-                       (keyup)="valdeteScann()"
-                       (keyup.enter)="valdeteScann()"
-                       type="number"
-                       class="form-control">               
-              </td>
-              <td class="td">
-
-                <textarea type="number"
-                          cols="7" rows="1"
-                          class="form-control"
-                          disabled
-                          style="color: gray !important;">                
-                </textarea>
-
-              </td>
-            </tr> -->
-        </tbody>
+          </tbody>
       </table>
 
 </div>
-
-<div class="repFinalTransacDesp" *ngIf="_reportBool" >
+<!-- _reportBool -->
+<div class="example-box" id="exbox" cdkDrag *ngIf="_reportBool">
+  <div class="heads">
+    <div class="btnsetts">
+      <div class="btns" title="Enviar correo eléctónico manual" (click)="sendMail()">
+        <mat-icon> 
+            mail
+        </mat-icon>
+      </div>
+      <div class="btns" title="minimizar" (click)="resize('exbox', 500, 'px', auto)">
+        <mat-icon> 
+            branding_watermark
+        </mat-icon>
+      </div>
+      <div class="btns" title="maximizar" (click)="resize('exbox', 100, '%', 0)">
+        <mat-icon>
+            fit_screen            
+        </mat-icon>
+      </div>
+      <div class="btns" title="cerrar" (click)="close()"  >
+        <mat-icon>
+          disabled_by_default
+        </mat-icon>
+      </div>
+    </div>
+  </div>
   <div class="container-fluid" >
 
     <div class="title">
-       <p> Reporte de despacho</p> <p class="number-note">{{_n_reporte}}</p> 
+       <p> Reporte de despacho</p> <p class="number-note">{{_n_reporte}}</p>
     </div>
-    <div class=" head container-fluid ">
+
+    <div class="head container-fluid">
+
         <div class="he1">
            <strong> Cliente: </strong> {{_cliente}}<br> 
            <strong> Dirección:</strong>{{_direccion}}<br> 
            <strong> Bodega: </strong>{{_bodega}}<br>     
            <strong> Concepto: </strong> {{_concepto}}<br>   
         </div>
+        
         <div class="he2">
            <strong> R.U.C.: </strong> {{_ruc}} <br>
            <strong> Teléfonos: </strong> {{_telefono}} <br>
            <strong> Emisión: </strong> {{_emision}} <br>
            <strong> F. Vencimiento: </strong> <br>{{_f_vencimiento}}
         </div>
+
     </div>
-    <div class="table-responsive">
+
+    <div class="table-responsive" id="tabRespons">
         <table class="table table-bordered
-                      table-dark table-hover
-                      align-middle
-                      table-sm">
-            <thead>
-                <tr>
-                    <th>Detalle</th>
-                    <th>Cantidad</th>
-                    <th>Despachado</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody class="table-warning table-bordered" id="tbody-arr">
-                
-            </tbody>
+                  table-dark table-hover
+                  align-middle
+                  table-sm">
+          <thead>
+              <tr>
+                  <th>Detalle</th>
+                  <th>Cantidad</th>
+                  <th>Despachado</th>
+                  <th>Total</th>
+              </tr>
+          </thead>
+          <tbody class="table-warning table-bordered" id="domtab"></tbody>
         </table>
     </div>
-    <footer id="foot"><p class="foottext">{{_footer}}</p></footer>
-</div>
+
+    <footer id="foot">
+      <p class="foottext">{{_footer}} {{_dateNow | date: 'short' }} </p>
+    </footer>
+
+  </div>
 
 </div>

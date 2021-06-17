@@ -64,6 +64,7 @@ import { OfflineDataComponent } from './offline-data/offline-data.component';
 import { LoginComponent } from './login/login.component';
 import { HeaderComponent } from './header/header.component';
 import { ReporteComponent } from './reporte/reporte.component';
+import { ControlempaqueComponent } from './controlempaque/controlempaque.component';
 
 @NgModule({
   declarations: [
@@ -76,6 +77,7 @@ import { ReporteComponent } from './reporte/reporte.component';
     LoginComponent,
     HeaderComponent,
     ReporteComponent,
+    ControlempaqueComponent,
   ],
   imports: [
     NgQrScannerModule,
@@ -131,9 +133,10 @@ import { ReporteComponent } from './reporte/reporte.component';
     ReactiveFormsModule,
     RouterModule.forRoot([
       { path: 'dash',   component: DashboardComponent },
-      { path: 'reporttransac',   component: ReporteComponent },
-      { path: 'Login', component: LoginComponent, pathMatch: 'full' },
-      { path: '**', pathMatch: 'full', redirectTo: 'Login'  }
+      { path: 'reporttransac',    component: ReporteComponent },
+      { path: 'controlempaque',   component: ControlempaqueComponent },
+      { path: 'Login',  component: LoginComponent, pathMatch: 'full' },
+      { path: '**',     pathMatch: 'full', redirectTo: 'Login'  }
     ]),
 
     BrowserAnimationsModule,

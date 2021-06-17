@@ -6,6 +6,8 @@ import { TInvcabgControllerService } from '../services/t-invcabg-controller.serv
 import { TokenGenerateService } from '../services/token-generate.service';
 import { EmailcontrolService } from '../services/emailcontrol.service';
 import { Observable } from 'rxjs';
+import { HttpEventType } from '@angular/common/http';
+import { EmailServicesService } from '../services/email-services.service';
 
 
 @Component({
@@ -14,6 +16,11 @@ import { Observable } from 'rxjs';
   styleUrls: ['./consfac.component.styl']
 })
 export class ConsfacComponent implements OnInit {
+
+  //foter INICIO
+   public _footer = `POFIDEL - `;
+  
+  //foter FIN
 
   //var report INICIO
   public _reportBool: boolean = false;
@@ -28,7 +35,7 @@ export class ConsfacComponent implements OnInit {
   public sliceNameFactB: string;
   public _typ: string;
   public _bodega: string;
-  public _dateNow;
+  public _dateNow = new Date();
   public _name: string;
   public scaningQR: number;
   public total: any;
@@ -66,7 +73,7 @@ export class ConsfacComponent implements OnInit {
   public _emision: string;
   public _f_vencimiento: string;  
   public _n_reporte: string;
-  public _footer;
+  // public _footer;
   public sumCantidad;
   public sumDespacho;
   //#endregion
@@ -77,18 +84,28 @@ export class ConsfacComponent implements OnInit {
   public observable: any;
   
 
+  //--------------------------variables httpEventType INICIO -----------------------------------------
+  //#region 
+  public upload;
+  public uploadTotal;
+  public porcentUploadTotal;
+  //#endregion
+  //--------------------------variables httpEventType FIN -----------------------------------------
+
+  //contenido de tabla a enviar por email
+  public tableSend;
+
   constructor( public dataFact: ControlprodService,
                public iDB: IndexedDBService,
                private desSave: TInvcabgControllerService,
                public tGener: TokenGenerateService,
-               public emServGen:EmailcontrolService  ) { }
+               public emServGen:EmailcontrolService,
+               public emailReport: EmailServicesService) { }
 
   ngOnInit() {
-    //this.execReport();
-    //this.deleteChilds('tbody-arr', document.getElementsByTagName('tr'));
     this.removesecuenceLocalStorage(1000);
     this.getFactType('0', '50');
-    this.datesNow();
+    //this.datesNow();
     this.dbREAD('scanDB');
     this.scaningQR = Number(localStorage.getItem('scann_number'));
     this._bodega = localStorage.getItem('bodega');
@@ -96,14 +113,46 @@ export class ConsfacComponent implements OnInit {
     this._options = localStorage.getItem('factura_number');
     this._name = localStorage.getItem('nomCliente');
 
+    //var tbodyRes = document.getElementById('tbody-arr');
+    //console.log(tbodyRes);
+
     this.emServGen.getEmail().subscribe( email =>
     {
       this.em = email;
       this.typeGen = email[0].tipoDespa_web;
       sessionStorage.setItem('Tipo', this.typeGen);
-    },
-    (err) => { })
+    }, (err) => { })
     
+  }
+
+  resize(a,b,c,height){
+    const ziner = document.getElementById(a);
+    ziner.style.width = `${b}${c}`;
+    ziner.style.top = '0px';
+    ziner.style.left = '0px';
+    if( height == 0 ) {
+      ziner.style.height = screen.height + 'px';
+    }
+    else {
+      ziner.style.height = height + 'px';
+    }
+  }
+
+  close() {
+    const tbodyReport = document.getElementById('domtab');
+    const exbox = document.getElementById('exbox');
+    //this._reportBool = false;
+    exbox.style.display = 'none';
+    
+    for( let m = 0; m < 2000; m++ ){
+      let atr = document.getElementById(`trTabReport-${m}`);
+      tbodyReport.removeChild(atr);      
+    }
+
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
+
   }
 
   removesecuenceLocalStorage(numberSecuenceClean: number) {
@@ -111,12 +160,6 @@ export class ConsfacComponent implements OnInit {
       localStorage.removeItem(`cantsScann-${a}`);
     }
   }
-
-  // createStructureDataTransac(data) {
-  //   this.iDB.createIndexedDB('transac-control-db', 1);
-  //   this.iDB.saveDataIndexedDB('transac-control-db', 1, data);
-  // }
-
 
   sliceNameFactF = (a, b) => {  
     this.sliceNameFact = a.slice(0,2);
@@ -127,17 +170,7 @@ export class ConsfacComponent implements OnInit {
     this._options = this.sliceNameFactB;
     this._name = b;
     this.getFacts( '_opt_', this.sliceNameFact, this.sliceNameFactB, 'V' );  
-  }
-
-  datesNow(): string {
-
-    let fecha = new Date();
-    let year = fecha.getFullYear();
-    let day = fecha.getDay();
-    let month = fecha.getMonth();
-    return this._dateNow = `${month}/${day}/${year}`; 
-  
-  }
+  } 
 
   public arrCursor: any = [];
   dbREAD(bd) {
@@ -161,8 +194,9 @@ export class ConsfacComponent implements OnInit {
           this.arrCursor.push(cursor.value);
           cursor.continue();
           this.scaningQR = this.arrCursor.length;
-          localStorage.setItem(bd, this.scaningQR.toString());        
+          localStorage.setItem(bd, this.scaningQR.toString());
         }
+
       }
     }
 
@@ -191,54 +225,57 @@ export class ConsfacComponent implements OnInit {
       referencia: this.sliceNameFact + this.sliceNameFactB
     }
 
-    console.log( this.arrCabSave );
-
+    
     this.desSave.despachoSaveCab(this.arrCabSave).subscribe( scab => {     
-      this.dataFact.getfactura('_opt_', this.sliceNameFact, this.sliceNameFactB, 'V' )
-                   .subscribe( FACTS => {
-        
-        // Transaciiones generales;
-        this.arrFacts = FACTS;  
-        // this.createStructureDataTransac(this.arrFacts);
 
-        /*Con este bucle recorremos el JSON de nuestra
-         petición GET this.dataFact.getfactura(...)
-         para enviar el resultado mediante
-         un POST hacia la base de datos... */
-        
-        //console.log(this.arrFacts);
+      if( scab.type == HttpEventType.UploadProgress ){
+        this.upload = scab.loaded / 1000000;
+        this.uploadTotal = scab.total / 1000000; //total bytes to upload
+        this.porcentUploadTotal = (this.upload / this.uploadTotal) * 100
+        console.log(this.porcentUploadTotal + '...%');
+        //document.getElementById('pBar').style.width = this.porcentUploadTotal + '%';
+      }
 
-        this.observable = new Observable(subscriber => {
-          subscriber.next(this.saveDespachos());
-          for( let m = 0; m <= this.arrFacts.length; m++ ) {
-            
+      console.log(scab);
+      console.log(this.arrFacts);
+      
+      if (scab.type === HttpEventType.Response) {
+
+          for( let v = 0; v < this.arrFacts.length; v++ ) {
+          
             this.arrDetSave = {
               T_llave:  sessionStorage.getItem('Session-Key'),
               tempo:    "despacho",
-              linea:    this.arrFacts[m].linea,
-              no_parte: this.arrFacts[m].no_parte,
-              cantidad: localStorage.getItem(`scann-${m}`)
+              linea:    this.arrFacts[v].linea,
+              no_parte: this.arrFacts[v].no_parte,
+              cantidad: localStorage.getItem(`scann-${v}`)
             }
 
-            subscriber.next(this.saveDetalle(this.arrDetSave));
-    
+            this.saveDetalle(this.arrDetSave);
+            //console.log(this.arrDetSave);
+          
           }
 
-          subscriber.next(this.exec());
-          subscriber.complete();
-    
-        });
-
+          setTimeout( () => {
+            console.log('EXEC');
+            this.exec();
+          },1500 );
+        
       }
 
-    )
+      let v = document.getElementById('tbody-arr');
+      setTimeout(() => {
+        for( let y = 0; y < 2000; y++ ) {
+          let atr = document.getElementById(`trPrincipal${y}`);
+          v.removeChild(atr);
+        }
+      }, 1500);
+      
+
     }, (err) => {
-      console.log(err);
-      // Swal.fire(
-      //   '¿Problemas de conexión?',
-      //   'Hemos guardado tu transacción en base de datos local. Con este token: ' + this.Token,
-      //   'info'
-      // )
+
+        console.log(err);
+
     })
     
   }
@@ -249,8 +286,80 @@ export class ConsfacComponent implements OnInit {
       postDetail => {
         console.log(postDetail);
         this.removesecuenceLocalStorage(1000);
+        this._reportBool = true;
       }
     )
+  }
+
+
+  public arrMailSendJSON: any = [];
+  sendMail() {
+    const tbodyReport = document.getElementById('domtab').outerHTML;
+    this.arrMailSendJSON = {
+      
+      txtPara:   "andrenimacion@gmail.com",
+      txtAsunto: `Reporte de despacho: ${this._n_reporte} `,
+      txtCopia:  "syscompsasa@gmail.com",
+      txtMensaje: `<div style="padding: 15px; border: solid 2px gray; 
+                    border-top-right-radius: 5px; border-top-left-radius: 5px;">
+                      <div>
+                        <div> <strong> Reporte de despacho: </strong> ${this._n_reporte} </div>
+                        <div> <strong> Cliente: </strong> ${this._cliente} </div><hr>
+                      </div>
+                      <div>
+                        <div> <strong> Dirección: </strong> ${this._direccion}</div>
+                        <div> <strong> Bodega: </strong> ${this._bodega} </div><hr>
+                      </div>
+                      <div>
+                        <div> <strong> Concepto: </strong> ${this._concepto}</div>
+                        <div> <strong> R.U.C.: </strong> ${this._ruc} </div><hr>
+                      </div>
+                      <div>
+                        <div> <strong> Telefono: </strong> ${this._telefono}</div>
+                        <div> <strong> Emision: </strong> ${this._emision}</div><hr>
+                      </div>                      
+                    </div>
+                    <hr>
+                    <div>
+                    <table style="width: 100%;">
+                    <thead style='background-color: #444; color: white;'>
+                    <th>Detalle</th>
+                    <th>Cantidad</th>
+                    <th>Despachado</th>
+                    <th>Total</th>
+                    </thead>
+                    <tbody style='background-color: #FAC193;'>
+                      ${tbodyReport}
+                    </tbody>
+                    </table>
+                    <hr style="border: dotted 2px gray;">
+                    Fecha de vencimiento: ${this._f_vencimiento}
+                    <h5><strong> POFIDEL - ${new Date()} - ECUADOR </strong></h5>
+                    <strong>Nota:</strong> No responder este email...
+                   </div>`,
+      MailAddress:  "syscompsasa@gmail.com",
+      passwordMail: "sysgye2016",
+      date_send_mail: new Date()
+      
+    }
+    
+    console.log(this.arrMailSendJSON);
+    this.emailReport.SendMailJson(this.arrMailSendJSON).subscribe( mail => {
+      console.log(mail)
+      Swal.fire({
+        icon: 'success',
+        title: 'Oops...',
+        text: 'Se ha enviado el correo electrónico, con éxito!',
+        // footer: 'Revisa tu conexión o la configuración de tu correo.'
+      })
+    }, () => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Bien...',
+        text: 'Se ha enviado el correo electrónico, con éxito!',
+        // footer: 'Revisa tu conexión o la configuración de tu correo.'
+      })
+    })
   }
   
   getComprobantController(data) {
@@ -268,43 +377,47 @@ export class ConsfacComponent implements OnInit {
     this.desSave.getExec(this.seesionToken, 'despacho').subscribe( exec => {
       
       this.arrCursor = exec;
-      console.log(this.arrExec);
-      this._reportBool = true;
-      const v = document.getElementById('tbody-arr');  
+      // console.log(this.arrCursor);
       for(let i = 0; i <= this.arrCursor.length; i++ ) {
+
         //---------------------------------------------------------------
         //bucle para recorre la cabecera
-        this._n_reporte = ` #${this.arrCursor[i][0].tipo + this.arrCursor[i][0].numero}`; 
-        this._cliente   = this.arrCursor[i][0].empcli;
-        this._direccion = this.arrCursor[i][0].direccion;
-        this._bodega    = this.arrCursor[i][0].bodega;
-        this._concepto  = this.arrCursor[i][0].comenta;
-        this._ruc       = this.arrCursor[i][0].ruc;
-        this._telefono  = this.arrCursor[i][0].fono1;
-        this._emision   = this.arrCursor[i][0].fechA_TRA;
-        this._f_vencimiento   = this.arrCursor[i][0].fecha_ven;            
+        this._n_reporte = ` #${this.arrCursor[i].tipo + this.arrCursor[i].numero}`;
+        this._cliente   = this.arrCursor[i].empcli;
+        this._direccion = this.arrCursor[i].direccion;
+        this._bodega    = this.arrCursor[i].bodega;
+        this._concepto  = this.arrCursor[i].comenta;
+        this._ruc       = this.arrCursor[i].ruc;
+        this._telefono  = this.arrCursor[i].fono1;
+        this._emision   = this.arrCursor[i].fechA_TRA;
+        this._f_vencimiento   = this.arrCursor[i].fecha_ven;
         //---------------------------------------------------------------
-        //bucle para recorrer el detalle
-        for(let f = 0; f <= this.arrCursor[i].length; f++) {              
-          const create_tr = document.createElement('tr');
-          //const create_td = document.createElement('td');
-          let ctr = v.appendChild(create_tr);
-          this.sumCantidad = Number(this.arrCursor[i][f].cantidad);
-          ctr.innerHTML = `<td style='font-size: 8pt;'>
-                            ${this.arrCursor[i][f].nombre}
+
+        //Creamos la tabla y la insertamos como HTML
+        const tbodyReport = document.getElementById('domtab'); 
+        const create_tr = document.createElement('tr');
+
+        let ctr = tbodyReport.appendChild(create_tr);
+        create_tr.setAttribute('id', `trTabReport-${i}`);
+
+        
+        this.tableSend =  `<td style='font-size: 8pt;'>
+                              ${this.arrCursor[i].nombre}
                            </td>
                            <td style='font-size: 8pt;'>
-                            ${this.arrCursor[i][f].cantidad}
+                              ${this.arrCursor[i].cantidad}
                            </td>
                            <td style='font-size: 8pt;'>
-                            ${this.arrCursor[i][f].despacho}
+                              ${this.arrCursor[i].despacho}
                            </td>
                            <td style='font-size: 8pt;'>
-                            ${this.arrCursor[i][f].cantidad 
-                            - this.arrCursor[i][f].despacho }
-                           </td> `;
-        }
+                              ${this.arrCursor[i].cantidad - this.arrCursor[i].despacho}
+                           </td>`;
+        
+        ctr.innerHTML = this.tableSend;
+        
       } 
+
     })
   }
 
@@ -437,7 +550,9 @@ export class ConsfacComponent implements OnInit {
   //#region
   
   getFacts(a,b,c,d) {
+    //const tbodyReport = document.getElementById('domtab');
     let v = document.getElementById('tbody-arr');
+    
     //let z = <HTMLInputElement> document.getElementById('scann');
     this.dataFact.getfactura(a,b,c,d).subscribe( FACTS => {
       this.arrFacts = FACTS;
@@ -455,6 +570,7 @@ export class ConsfacComponent implements OnInit {
         
         const create_tr = document.createElement('tr');
         //const create_td = document.createElement('td'); 
+        create_tr.setAttribute('id', `trPrincipal${f}`)
         
         let ctr = v.appendChild(create_tr);
         //this.sumCantidad = Number(this.arrCursor[i][f].cantidad);
