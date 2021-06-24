@@ -1,0 +1,213 @@
+.dashContEmp
+    background-color whitesmoke
+    border-radius 5px
+    height 450px
+    display flex
+    justify-content space-between
+    flex-wrap wrap
+
+td
+    cursor pointer
+
+#fileUp
+    opacity 0
+    width 1px
+    height 1px
+    
+audio
+    display none
+
+
+
+#lb
+    width 48%
+
+.visor
+    width 60%
+
+.tables
+    width 280px
+    height 420px
+    overflow-y auto
+   
+@media screen and (max-width: 600px) {
+    .tables {
+        width: 100%;
+    }
+
+    .visor {
+        margin-top 25px
+        width: 100%; 
+    }
+}
+    
+
+.tables::-webkit-scrollbar 
+    background-color #171717
+    width 10px
+
+.tables::-webkit-scrollbar-thumb
+    background-color #4C36C6
+    border-radius 10px
+    width  8px
+    height 8px
+
+thead, th
+    background-color #4C36C6 !important
+    color white
+    padding 5px
+
+.vs
+    display flex
+    justify-content space-between
+
+// .modal-backdrop
+//     top 0px
+//     display none !important
+
+#exampleModalLabel
+    display flex
+
+.foto
+    width 100%
+    height 280px
+    border dashed 1px gray
+    cursor pointer
+    transition ease  all 0.5s
+    background-size 100%
+    &:hover
+        transition ease  all 0.5s
+        border solid 1.5px yellowgreen
+        border-radius 5px
+
+.btnSetts
+    display flex
+    justify-content space-between
+
+
+.pistoleada
+    width 48%
+    height 280px
+    background-color #4C36C6
+    color white
+    font-size 45pt
+    font-weight bold
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+
+.note
+    font-size 10pt
+    display flex
+    align-items center
+    jutify-content stretch
+
+
+/*QR SCANN INICIO*/
+
+.dpix {
+    /* border: solid 1px gray; */
+    width: 300px;
+}
+
+.congen {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    position: absolute;
+}
+
+.prds {
+    color #D3A704
+    width 300px
+}
+.contsQR
+    display flex
+    justify-content center
+   
+.scan
+    width 300px
+    height 290px
+
+.btnCamSetts {
+    display: flex;
+    justify-content: stretch;
+}
+
+.camCh:hover {
+    transition: ease all 0.5s;
+    background-color: rgb(230, 198, 17);
+    color: black;
+}
+
+.camCh {
+    transition: ease all 0.5s;
+    cursor: pointer;
+    padding: 10px;
+    background: #444;
+    color: white;
+}
+
+@media screen and (max-width: 600px) {
+    .dpix {
+        width: 100%;
+    }
+}
+
+.title {
+    display: flex;
+    justify-content: stretch;
+    align-items: center;
+}
+
+.cdk-overlay-connected-position-bounding-box {
+    position: absolute !important;
+}
+
+.mat-icon-button {
+    border-radius: 0px !important;
+}
+
+.rec {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+
+/* #region animaciones */
+
+@keyframes animEntrada {
+    0% {
+        opacity: 0;
+        transform: translateX(0px);
+    }
+    10% {
+        transform: translateX(-15px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(150px);
+    }
+}
+
+@keyframes animSalida {
+    0% {
+        opacity: 1;
+        transform: translateX(150px);
+    }
+    10% {
+        opacity: 1;
+        transform: translateX(165x);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(0px);
+    }
+}
+
+/*QR SCANN FIN*/

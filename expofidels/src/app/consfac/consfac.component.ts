@@ -396,7 +396,7 @@ export class ConsfacComponent implements OnInit {
         //Creamos la tabla y la insertamos como HTML
         const tbodyReport = document.getElementById('domtab'); 
         const create_tr = document.createElement('tr');
-
+        
         let ctr = tbodyReport.appendChild(create_tr);
         create_tr.setAttribute('id', `trTabReport-${i}`);
 

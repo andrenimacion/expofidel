@@ -81,13 +81,17 @@ export class QrscannComponent implements OnInit {
           }
 
           if (choosenDev) {
+
               this.qrScannerComponent.chooseCamera.next(choosenDev);
+
           }
 
           else {
-            this.qrScannerComponent.chooseCamera.next(videoDevices[0]);
-          }
 
+            this.qrScannerComponent.chooseCamera.next(videoDevices[0]);
+            
+          }
+          
       }
 
   });
@@ -114,9 +118,8 @@ export class QrscannComponent implements OnInit {
       if (this.sliceNum.toString() != localStorage.getItem('no_parte'))  {        
         
         this.iDB.elBDData('scanDB');
-        console.log('[CODIGO] Es diferente: ' + 
-                     this.sliceNum.toString() + ' ' +
-                     localStorage.getItem('no_parte'));
+        console.log('[CODIGO] Es diferente: ' + this.sliceNum.toString() 
+                    + ' ' + localStorage.getItem('no_parte'));
         
         Swal.fire({
          
@@ -132,7 +135,7 @@ export class QrscannComponent implements OnInit {
 
           localStorage.removeItem('scann_number');
           localStorage.setItem('scann_number', '0');
-          this.reiniciarQR();
+          // this.reiniciarQR();
 
           if (result.isConfirmed) {
             Swal.fire(              
@@ -151,7 +154,6 @@ export class QrscannComponent implements OnInit {
         console.log('[CODIGO] Es igual: ' +
                     this.sliceNum.toString() + ' ' +
                     localStorage.getItem('cod_prod'));
-                          
       }
     });
   }

@@ -1,1 +1,123 @@
-<p>controlempaque works!</p>
+<!-- QR CODE INICIO -->
+
+<div *ngIf="true" class="QR">
+
+    <div class="contsQR animated fadeIn fast">
+        <div class="contapp">
+        <div class="btnCamSetts" >
+    
+            <div class="rec btn btn-warning" (click)="reiniciarQR()">
+                <mat-icon> published_with_changes </mat-icon>Recargar Lector-QR
+            </div>
+    
+            <div (click)="changeCamera()" class="camCh">
+                <mat-icon>flip_camera_ios</mat-icon>
+            </div>
+    
+        </div>
+    
+        <div class="scan" (click)="activeSound()">
+            <qr-scanner [debug]="false" [canvasWidth]="300" [canvasHeight]="280" [stopAfterScan]="false" [updateTime]="300"></qr-scanner>            
+            <audio id="audio" controls id="soundQR">
+                <source src="../../assets/scanQR.mp3">
+            </audio>
+        </div>
+            
+        <div class="prds" style="cursor: pointer;">
+            Descripción de producto: <br> {{codPRODS}}
+         </div>
+    
+    </div>
+        
+    
+    </div>
+
+</div>
+
+<!-- QR CODE FIN -->
+
+
+<div class="container-fluid p-3">
+    <mat-form-field class="example-full-width">
+        <mat-label>Filtro por Lote:</mat-label>
+        <input matInput placeholder="Lote" [(ngModel)]="_lote" (keyup.enter)="filterLote(_lote, 50)" >
+    </mat-form-field>
+</div>
+
+<div class="dashContEmp container-fluid p-3">
+    <div class="tables">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <th> Lote </th>
+                <!-- <th> Cant. </th> -->
+                <th> Descripción </th>
+            </thead>
+            <tbody class="table-warning">
+                <tr *ngFor="let x of loteArr" (click)="getLote(x.no_parte, x.lote, x.cantidad)">
+                    <td>{{ x.lote }}</td>
+                    <td>{{ x.nomParte }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="visor">
+        <!-- <mat-icon>
+            perm_media
+        </mat-icon> -->
+        <div class="btnSetts">
+            <button class="btn btn-warning btn-sm" (click)="upFoto()"
+            style="display: flex; justify-content: center; align-items: center;">
+                <mat-icon>
+                    save
+                </mat-icon>
+                <strong>Guardar Foto</strong>
+            </button>
+            <button class="btn btn-warning" (click)="_QRBool = !_QRBool" >
+                <mat-icon>
+                    qr_code_scanner
+                </mat-icon>
+            </button>
+        </div>
+        <div class="vs">
+            
+            <label for="fileUp" id="lb">
+                <div class="foto" id="imgTest" (change)="encodeImageFileAsURL();"
+                     [(ngModel)]="_IMGE" name="_IMGE"
+                     [ngStyle]="{'background-image': 'url(&quot;' + _IMGE + '&quot;)'}">
+                     <input class="form-control form-control-sm" id="formFileSm"
+                            type="file" id="fileUp">
+                </div>
+            </label>
+            
+            <div class="pistoleada">
+                
+                <span class="note"><mat-icon>fact_check</mat-icon>Items escaneados:</span>
+                {{_pistoleada}}
+            </div>
+        </div>
+        <div class="tablerep mt-2">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <th>
+                        Lote
+                    </th>
+                    <th>
+                        Cantidad
+                    </th>
+                    <th>
+                        Diferencia 
+                    </th>
+                </thead>
+                <tbody class="table-warning">
+                    <tr>
+                        <td>
+                            {{_lote}}
+                        </td>
+                        <td>{{this._canti}}</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
