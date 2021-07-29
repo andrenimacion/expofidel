@@ -1,123 +1,135 @@
-<!-- QR CODE INICIO -->
-
-<div *ngIf="true" class="QR">
-
-    <div class="contsQR animated fadeIn fast">
-        <div class="contapp">
-        <div class="btnCamSetts" >
-    
-            <div class="rec btn btn-warning" (click)="reiniciarQR()">
-                <mat-icon> published_with_changes </mat-icon>Recargar Lector-QR
-            </div>
-    
-            <div (click)="changeCamera()" class="camCh">
-                <mat-icon>flip_camera_ios</mat-icon>
-            </div>
-    
-        </div>
-    
-        <div class="scan" (click)="activeSound()">
-            <qr-scanner [debug]="false" [canvasWidth]="300" [canvasHeight]="280" [stopAfterScan]="false" [updateTime]="300"></qr-scanner>            
-            <audio id="audio" controls id="soundQR">
-                <source src="../../assets/scanQR.mp3">
-            </audio>
-        </div>
-            
-        <div class="prds" style="cursor: pointer;">
-            Descripción de producto: <br> {{codPRODS}}
-         </div>
-    
-    </div>
-        
-    
-    </div>
-
-</div>
-
-<!-- QR CODE FIN -->
 
 
+<!-- 
 <div class="container-fluid p-3">
     <mat-form-field class="example-full-width">
-        <mat-label>Filtro por Lote:</mat-label>
-        <input matInput placeholder="Lote" [(ngModel)]="_lote" (keyup.enter)="filterLote(_lote, 50)" >
-    </mat-form-field>
-</div>
 
-<div class="dashContEmp container-fluid p-3">
-    <div class="tables">
-        <table class="table table-bordered table-hover">
-            <thead>
-                <th> Lote </th>
-                <!-- <th> Cant. </th> -->
-                <th> Descripción </th>
-            </thead>
-            <tbody class="table-warning">
-                <tr *ngFor="let x of loteArr" (click)="getLote(x.no_parte, x.lote, x.cantidad)">
-                    <td>{{ x.lote }}</td>
-                    <td>{{ x.nomParte }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <mat-label>Filtro por Lote:</mat-label>
+
+        <input matInput placeholder="Lote"
+               [(ngModel)]="_lote"
+               (keyup.enter)="filterLote(_lote, 50)">
+
+    </mat-form-field>
+</div> -->
+
+<!-- <div class="btnMin" (click)=" _TableVisor = !_TableVisor">
+    <mat-icon>article</mat-icon> Elegir lotes
+</div>
+ -->
+<div class="dashContEmp container-fluid p-3">    
     <div class="visor">
-        <!-- <mat-icon>
-            perm_media
-        </mat-icon> -->
         <div class="btnSetts">
-            <button class="btn btn-warning btn-sm" (click)="upFoto()"
-            style="display: flex; justify-content: center; align-items: center;">
-                <mat-icon>
-                    save
-                </mat-icon>
-                <strong>Guardar Foto</strong>
+
+            <button class="btn btn-warning btn-sm" (click)="visorController(false, true)" 
+                    style="display: flex; justify-content: center; align-items: center;" >
+                    <mat-icon>yard</mat-icon>
             </button>
-            <button class="btn btn-warning" (click)="_QRBool = !_QRBool" >
-                <mat-icon>
-                    qr_code_scanner
-                </mat-icon>
+
+            <button class="btn btn-warning" (click)="visorController(true, false); reiniciarQR()">
+                <mat-icon>qr_code_scanner</mat-icon>
             </button>
+
+            <div class="btnCamSetts" >
+                <div class="btn btn-primary" *ngIf="bolup" (click)="upFoto()">
+                    <mat-icon>upgrade</mat-icon>
+                </div>                
+                <div class="camChs" title="scaneo / catidad / diferencia / código lote a escanear / código scaneado actual " >
+                     {{_pistoleada}} &nbsp; / &nbsp; {{_canti}} &nbsp; / &nbsp;  {{difer}}  &nbsp; / &nbsp; {{_lote}} &nbsp; / &nbsp; {{codPRODS}}
+                </div>
+            </div>
+
         </div>
+        
         <div class="vs">
             
-            <label for="fileUp" id="lb">
+            <label for="fileUp" id="lb" *ngIf="_imgVisor">
                 <div class="foto" id="imgTest" (change)="encodeImageFileAsURL();"
                      [(ngModel)]="_IMGE" name="_IMGE"
                      [ngStyle]="{'background-image': 'url(&quot;' + _IMGE + '&quot;)'}">
-                     <input class="form-control form-control-sm" id="formFileSm"
-                            type="file" id="fileUp">
-                </div>
+                     <input class="form-control form-control-sm" type="file" id="fileUp">
+                </div>                
             </label>
             
             <div class="pistoleada">
-                
-                <span class="note"><mat-icon>fact_check</mat-icon>Items escaneados:</span>
-                {{_pistoleada}}
-            </div>
+            <div *ngIf="_QrVisor" class="QR">         
+                <!--<span class="note" style="font-size: 12pt;">visor QR</span>-->
+                <div class="contsQR animated fadeIn fast">
+                    <div class="contapp">                    
+                    <div class="scan" (click)="activeSound()">
+                        <qr-scanner [debug]="false" [canvasWidth]="250"
+                                    [canvasHeight]="220" [stopAfterScan]="false"
+                                    [updateTime]="50" >
+                        </qr-scanner>
+
+                        <audio id="audio" controls id="soundQR">
+                            <source src="../../assets/scanQR.mp3">
+                        </audio>                    
+                    </div>
+                    <label id="labll" style="color: white; font-size: 9pt;" class="p-3">
+                        <span class="text-info"> Contenido escaneado:</span><br>{{resGen}}
+                    </label>
+                </div>
+            </div>            
         </div>
+    <!-- QR CODE FIN -->
+    </div>
+</div>
         <div class="tablerep mt-2">
-            <table class="table table-bordered table-hover">
+
+            <table class="table table-bordered table-hover" >
                 <thead>
-                    <th>
-                        Lote
-                    </th>
-                    <th>
-                        Cantidad
-                    </th>
-                    <th>
-                        Diferencia 
-                    </th>
+                    <th>Lote        </th>
+                    <th>Cantidad    </th>
+                    <th>Escaneados</th>
+                    <th>Diferencia  </th>
                 </thead>
                 <tbody class="table-warning">
                     <tr>
+                        <td> {{_lote}}  </td>
                         <td>
-                            {{_lote}}
+                            {{_canti}}
                         </td>
-                        <td>{{this._canti}}</td>
-                        <td></td>
+                        <td>
+                            <input type="number" class="form-control"
+                                   [(ngModel)]="_escane" name="_canti"
+                                   style="color: black !important;" placeholder="0" (change)="operLote(_canti, _escane)" >
+                        </td>
+                        <td> {{difer | number : '1.2-2'}}  </td>
                     </tr>
                 </tbody>
             </table>
+
         </div>
+    </div>
+    <div class="tables" *ngIf="_TableVisor">      
+    
+        <mat-icon style="color: orangered; cursor: pointer; float: right;" (click)="_TableVisor = !_TableVisor">
+            cancel
+        </mat-icon>
+    
+        <table class="table table-bordered table-hover">
+            
+            <thead>
+                <th> Lote </th>
+                <th> Descripción </th>
+                <th> Estado </th>
+            </thead>
+            
+            <tbody class="table-primary">
+                <tr *ngFor="let x of loteArr" (click)="getLote(x.no_parte, x.lote, x.cantidad, x.comproba)">
+                    <td>
+                        {{ x.lote }}
+                    </td>
+                    <td>
+                        {{ x.nomParte }}
+                    </td>
+                    <td class="tds" [ngStyle]="{'background-color': x.colorTable}" >
+                        {{ x.estado_lote }}
+                    </td>
+                </tr>
+            </tbody>
+    
+        </table>
     </div>
 </div>

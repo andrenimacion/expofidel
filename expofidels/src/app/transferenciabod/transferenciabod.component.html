@@ -1,0 +1,389 @@
+
+
+<div class="typeTransac" cdkDrag *ngIf="tTransBool" >
+    
+    <p style="font-size: 11pt; color: white; display: flex; align-items: center; justify-content: space-between;">
+
+        <mat-icon>receipt</mat-icon>Guía de transacciones:
+        
+        <mat-icon style="color: orangered; cursor: pointer;" (click)="tTransBool = !tTransBool">
+            cancel
+        </mat-icon>
+
+    </p>
+
+    <table class="table table-warning table-hover">
+        <thead class="theadTransac">
+            <th>Codigo</th>
+            <th>Nombre</th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let arrs of arrTransac" (click)="gTrans(arrs.codigo + ' / ' + arrs.nombre, arrs.codigo); tTransBool = !tTransBool " >
+               <td>{{arrs.codigo}}</td>
+               <td>{{arrs.nombre}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="boolUp" *ngIf="boolUp" cdkDrag style="display: flex; flex-direction: column; align-items: flex-end;" >
+
+    <mat-icon style="color: orangered;" (click)="boolUp = !boolUp">
+        cancel
+    </mat-icon>
+    
+    <mat-form-field style="width: 200px;" class="example-full-width" appearance="fill">
+        <mat-label>Cantidad a modificar:</mat-label>
+        <input matInput type="number" placeholder="" [(ngModel)]="_cnti" (change)="validateCantidad(_cnti)">
+    </mat-form-field>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+        <p class="note" style="color: orangered ; font-size: 9pt !important;">
+            <strong> Código: </strong> {{codigo}} / {{IDUP}}
+        </p>
+        <!-- (click)=" " -->
+        <button class="btn btn-warning" (click)="validateNegative(IDUP, 'b')"><mat-icon>update</mat-icon></button>
+    </div>
+
+</div>
+
+<div class="table-bodegas" id="t1"  *ngIf="boolBodegas">
+    
+    <div class="bodegIn">
+        <button type="button" class="btn-close m-2 mr-4" aria-label="Close" (click)="boolBodegas = !boolBodegas"></button>
+            Bodega de Ingreso: &nbsp;&nbsp; <mat-icon>chevron_right</mat-icon>
+    </div>
+
+    <div class="headInput">
+        <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Buscar por código o nombre:</mat-label>
+            <input matInput [(ngModel)]="_bodser" (keyup.enter)="this.gBodegas(_bodser)" >
+        </mat-form-field>
+    </div>
+    
+    <table class="table table-dark table-hover">
+
+        <thead class="table-secondary">
+            <th>Código</th>
+            <th>Nombre</th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let x of arrBodegas" 
+                (click)="getCodecBodegaA( x.codigo, x.nombre );
+                         controlBodRep();
+                         searchProd(x.codigo)">
+                <td>{{x.codigo}}</td>
+                <td>{{x.nombre}}</td>
+            </tr>
+        </tbody>
+
+    </table>
+
+</div>
+
+<div class="table-bodegas" id="t2"  *ngIf="boolBodegasB" >
+    <div class="bodegInB"><button type="button" class="btn-close m-2 mr-4" aria-label="Close"  (click)="boolBodegasB = !boolBodegasB"></button>
+        Bodega de Salida: &nbsp;&nbsp; <mat-icon>chevron_left</mat-icon></div>
+    <div class="headInput">
+        <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Buscar por código o nombre:</mat-label>
+            <input matInput [(ngModel)]="_bodserB" (keyup.enter)="this.gBodegas(_bodserB)" >
+        </mat-form-field>
+    </div>
+    <table class="table table-dark table-hover">
+        <thead class="table-secondary">
+            <th>Código</th>
+            <th>Nombre</th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let j of arrBodegas" (click)="getCodecBodegaB( j.codigo, j.nombre ); controlBodRep()">
+                <td>{{j.codigo}}</td>
+                <td>{{j.nombre}}</td>
+            </tr>
+        </tbody>
+
+    </table>
+
+</div>
+
+<div class="contGen container">
+
+   
+
+    <div class="header" id="header">
+        <div style="display: flex; flex-direction: column; width: 100%;" >
+            <div id="chartdiv" style=" width: 100%; height: 450px; background-color: darkgrey; padding: 25px;"></div>
+            <button class="btn btn-warning" (click)="graphicrep()">
+                Obtener Gráfico
+            </button>
+        </div>
+        <div class="pSet">
+
+            <mat-form-field class="mat example-full-width" appearance="fill" (click)="tTransBool = !tTransBool">
+                <mat-label>Transacción:</mat-label>
+                <input matInput disabled placeholder=""  [(ngModel)]="_transaccion"  >
+            </mat-form-field>
+
+            <mat-form-field class="mat example-full-width" appearance="fill">
+                <mat-label>Número de Comprobante:</mat-label>
+                <input matInput placeholder="00000000" value="00000000" (keyup.enter)="getReport()">
+            </mat-form-field>
+
+            <mat-form-field class="mat example-full-width" appearance="fill">
+                <mat-label>Fecha:</mat-label>
+                <input matInput disabled placeholder="" value="{{_fechaAct | date: 'MM/dd/yyyy'}}">
+                <span class="note" style="color: tomato; font-size: 9pt;"> mes/día/año </span>
+            </mat-form-field>
+
+        </div>
+
+        <div class="pSet">
+
+            <mat-form-field class="mat example-full-width" appearance="fill" *ngIf="boolBodOri" (click)="boolBodegas = !boolBodegas ">
+                <mat-label>Bodega Origen:</mat-label>
+                <input matInput placeholder="" disabled [(ngModel)]="_bodser" >
+            </mat-form-field>
+
+            <label style="color: white; border: dashed 1px white; border-radius: 10px; display: flex; justify-content: center; align-items: center; padding: 15px; " *ngIf="_bodserBool" >
+                {{_bodser}}
+            </label>
+            
+            <mat-form-field class="mat example-full-width"  appearance="fill" (click)="boolBodegasB = !boolBodegasB" >
+                <mat-label>Bodega Destino:</mat-label>
+                <input matInput placeholder=""  disabled [(ngModel)]="_bodserB">
+            </mat-form-field>
+
+        </div>
+
+        <mat-form-field style="width: 100%;" class="mat example-full-width"  appearance="fill" >
+            <mat-label>Observación:</mat-label>
+            <input matInput placeholder=""  [(ngModel)]="_observ" >
+        </mat-form-field>
+
+    </div>
+    
+    <div class="btnSets" style="display: flex; justify-content: stretch;">
+
+        <button class=" nbtn btn btn-warning" (click)="comprobateBodega()" > 
+            <mat-icon> fact_check </mat-icon> Nuevo
+        </button>
+
+        <button class=" nbtn btn btn-success" (click)="transferir(_observ)" >
+            <mat-icon> compare_arrows </mat-icon> Transferir
+        </button>
+
+    </div>
+
+    <div class="bodyComp table-responsive" *ngIf="_boolTableShow" >
+
+        <div class="xbtn">
+            <button type="button" class="close btn-close m-2 mr-4" aria-label="Close"  (click)="activateBodIngreso()"></button>
+        </div>
+        
+        <table class="table table-sm align-middle table-dark table-striped table-bordered border-primary">
+
+            <thead>
+                <th>Código          </th>
+                <th>Descripción     </th>
+                <th>Presentación    </th>
+                <th>Cantidad        </th>
+                <th>                </th>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td class="code">
+                        <mat-form-field style="width: 80px;" id="matCod" class="example-full-width"  appearance="fill" (click)="getCodec()" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" >
+                            <mat-label>Código:</mat-label> <input matInput disabled placeholder="" [(ngModel)]="_cod" >
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="example-full-width"  appearance="fill">
+                            <mat-label>Descripción:</mat-label> <input matInput disabled placeholder="" [(ngModel)]="_desc">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="example-full-width"  appearance="fill">
+                            <mat-label>Presentación:</mat-label> <input matInput disabled placeholder="" [(ngModel)]="_pres">
+                        </mat-form-field>
+                    </td>
+                    <td >
+                        <mat-form-field style="width: 100px;" class="example-full-width"  appearance="fill" >
+                            <mat-label>Cantidad:</mat-label>
+                            <input type="number" matInput placeholder="0.00"   (keyup)="validateCantidad(_cnti)" [(ngModel)]="_cnti" (change)="validateCantidad(_cnti)" >
+                        </mat-form-field>
+                        <div style="font-size: 14pt; border-bottom-right-radius: 5px; color: white; padding: 5px; position: absolute; top: 0px; left: 0px; background-color: crimson;">Stock: {{_STCK}}</div>
+                    </td>
+
+                    <td (click)=" validateNegative(IDUP, 'a')" style="display: flex; height: 67.25px; justify-content: center; align-items: center;" >
+                        <mat-icon>add_box</mat-icon>
+                    </td>
+                </tr>           
+
+            </tbody>
+
+        </table>
+        <div class="tableRespuesta">
+
+            <table class=" table ">
+
+                <thead style="background-color: tomato; color: white;" >
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Presentación</th>
+                    <th>Cantidad</th>
+                    <th title="stock restante" >Stock Rest.</th>
+                    <td style="background-color: transparent !important;"> <mat-icon>create</mat-icon></td>
+                    <td style="background-color: transparent !important;"> <mat-icon>block </mat-icon></td>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let mx of arrGenTransProd" style="color: white;" >
+
+                        <td> {{mx.codigo}}          </td>
+                        <td> {{mx.descripcion}}     </td>
+                        <td> {{mx.presentacion}}    </td>
+                        <td> {{mx.cantidad}}        </td>
+                        <td> {{mx.difer_stcok}}     </td>
+                        
+                        <td (click)="getNewCant(mx.codigo, mx.id); upProduct(mx.codigo, mx.descripcion, mx.presentacion, mx.stock)">
+                            <mat-icon>create</mat-icon>
+                        </td>
+                        <td (click)="delTransProd(mx.id)">
+                            <mat-icon>block</mat-icon>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+
+    <div class="offcanvas offcanvas-end" style="width: 85% !important;" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div class="offcanvas-header">
+          
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="graphics">
+                <strong style="display: flex; align-items: center;"> <mat-icon>analytics</mat-icon>
+                     Vista general de las bodegas y sus respectivos productos: </strong>
+               
+            </div>
+            <div class="tabHelpProd  table-responsive   mt-2 ">
+                <strong>  <p class="text text-secondary"> Cantidad de productos encontrados:  {{cantProdBod}} </p> </strong>
+                <table class="table table-bordered border-light ">
+                    <thead class="the table-dark table-bordered border-light">
+                        <th># Parte         </th>
+                        <th>Nombre          </th>
+                        <th>Presentación    </th>
+                        <th>Stock           </th>
+                    </thead>
+        
+                    <tbody class="table-dark table-bordered border-light" >
+                        <tr *ngFor="let mi of prodBodArr" data-bs-dismiss="offcanvas" class="trSelec" [ngStyle]="{'border-color': mi.color}" (click)="upProduct(mi.no_parte, mi.nombre, mi.presentacion, mi.stock)" >
+                            <td>{{ mi.no_parte }}     </td>
+                            <td>{{ mi.nombre }}       </td>
+                            <td>{{ mi.presentacion }} </td>
+                            <td [ngStyle]="{'background-color': mi.color}" >{{ mi.stock }}   </td>
+                        </tr>
+                    </tbody>
+        
+                </table>
+                
+            </div> 
+        </div>
+    </div>
+    
+
+</div>
+
+<div class="repo" *ngIf="repoBool">
+    
+    <section style="text-align: center;"> 
+        <h2>
+            <hr>
+                <div class="transBode">
+                    <strong>TRANSFERENCIA DE BODEGAS</strong> 
+                    <h4>
+                        <strong>                       
+                            <span class="text text-danger" style="font-size: 27pt;">
+                                {{_tipoTran}} {{_numero}}
+                            </span>
+                        </strong>
+                    </h4>
+                </div>
+            <hr>
+        </h2>
+    </section>
+    <div class="header">
+
+        <div class="head">
+            <div> Bodega de destino: &nbsp; <strong>  {{bod_desti}}                 </strong> </div>
+            <div> Fecha de emisión:  &nbsp; <strong>  {{fech_emi | date: 'medium'}} </strong> </div>
+            <div> Observación:       &nbsp; <strong>  {{_observerrep}}              </strong> </div>
+            <div> Bodega de origen:  &nbsp; <strong>  {{bod_ori}}                   </strong> </div>
+        </div>
+
+        <div class="head">
+            <div> Fecha de Transacción:  &nbsp; <strong> {{fech_tran | date: 'medium' }} </strong> </div>
+            <div> Cod.Usuario:           &nbsp; <strong> {{us_cla}}                      </strong> </div>
+        </div>
+
+    </div>
+
+    <div class="bodyrep">
+
+        <table class="table table-warning">
+            <thead class="table-info">
+                <th>Producto</th>
+                <th>Descripción del Producto</th>
+                <!-- <th>Cod. Int.</th> -->
+                <th>Presenta</th>
+                <th>Cantidad</th>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let jk of repoArr">
+                    <td><strong> {{jk.no_parte}} </strong></td>
+                    <td><strong> {{jk.des_noparte}} </strong></td>
+                    <!-- <td></td> -->
+                    <td><strong> {{jk.presenta}} </strong></td>
+                    <td><strong> {{jk.cantidad}} </strong></td>
+                </tr>
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="footerRep">
+        <div style="display: flex; flex-direction: column; text-align: center; width: 145px; margin-top: 100px;">
+            <strong>
+                ___________________
+                <br>
+                Vto. bueno
+            </strong>
+        </div>
+
+        <div style="display: flex; flex-direction: column; text-align: center; width: 145px; margin-top: 100px;">
+            <strong>
+                ___________________
+                <br>
+                Revisado por:
+            </strong>
+        </div>
+
+        <div style="display: flex; flex-direction: column; text-align: center; width: 145px; margin-top: 100px;">
+            <strong>
+                ___________________
+                <br>
+                Aprobado por:
+            </strong>
+        </div>
+    </div>
+
+</div>
+
+

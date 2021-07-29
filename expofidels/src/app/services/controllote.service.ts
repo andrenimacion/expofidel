@@ -9,16 +9,30 @@ export class ControlloteService {
   private apiURL = 'https://alp-cloud.com:8453/api';
   constructor(private http: HttpClient) { }
 
-  getLoteFilter(filter, top) {
-    return this.http.get(this.apiURL + '/products/getLote/' + filter + '/' + top);
-  }
+    getLoteFilter(filter, nopart, top) {
+      return this.http.get(this.apiURL + '/products/getLote/' + filter + '/' + nopart + '/' + top);
+    }
 
-  upimg( pk, content ) {
-    return this.http.put( this.apiURL + '/img_lote/put_imge_lote/' + pk , content );
-  }
+    upimg( pk, content ) {
+      return this.http.put( this.apiURL + '/img_lote/put_imge_lote/' + pk , content );
+    }
 
-  getimgbyNparte(nparte) {
-    return this.http.get( this.apiURL + '/products/getLoteimg/' + nparte );
-  }
+    getimgbyNparte(nparte) {
+      return this.http.get( this.apiURL + '/products/getLoteimg/' + nparte );
+    }
 
-  }
+    // http://localhost:5000/api/products/estadoLote/T/EM/00000001
+    updateEstate(estadolote, tipo, numero) {
+      return this.http.get( this.apiURL + '/products/estadoLote/' + estadolote + '/' + tipo + '/' + numero )
+    }
+
+    getloteFilterExec(filter,  opts) {
+      return this.http.get( this.apiURL + '/products/getLoteFilter/' + filter + '/'  +  opts );
+    }
+
+    getloteFilterNProd(filter, noparte) {
+      return this.http.get( this.apiURL + '/products/getLoteCodNpart/' + filter + '/' + noparte );
+    }
+
+
+}

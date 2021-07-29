@@ -40,152 +40,146 @@ export class QrscannComponent implements OnInit {
 
     // Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
     // Add 'implements AfterViewInit' to the class.
-    this.cameraControl(this.camera);
+    // this.cameraControl(this.camera);
 
   }
   
-  cameraControl(a) {
+  // cameraControl(a) {
 
-    this.qrScannerComponent.getMediaDevices().then(devices => {
-      //console.log(devices);
-      const videoDevices: MediaDeviceInfo[] = [];
-      for (const device of devices) {
+  //   this.qrScannerComponent.getMediaDevices().then(devices => {
+  //     //console.log(devices);
+  //     const videoDevices: MediaDeviceInfo[] = [];
+  //     for (const device of devices) {
           
-          if (device.kind.toString() === 'videoinput') {
-              videoDevices.push(device);
-              this.devices = videoDevices;
-          }
+  //         if (device.kind.toString() === 'videoinput') {
+  //             videoDevices.push(device);
+  //             this.devices = videoDevices;
+  //         }
 
-      }
+  //     }
 
-      if (videoDevices.length >= 0) {
-        let choosenDev;
+  //     if (videoDevices.length >= 0) {
+  //       let choosenDev;
 
-        for (const dev of videoDevices) {
+  //       for (const dev of videoDevices) {
 
-              if (dev.label.includes(a)) {
+  //             if (dev.label.includes(a)) {
 
-                  choosenDev = dev;
-                  this.messageCam = 'Si tiene camara posterior';
-                  break;
+  //                 choosenDev = dev;
+  //                 this.messageCam = 'Si tiene camara posterior';
+  //                 break;
 
-              }
+  //             }
 
-              else {
+  //             else {
 
-                choosenDev = dev;
-                this.messageCam = 'No tiene camara posterior';
+  //               choosenDev = dev;
+  //               this.messageCam = 'No tiene camara posterior';
 
-              }
+  //             }
 
-          }
+  //         }
 
-          if (choosenDev) {
+  //         if (choosenDev) {
 
-              this.qrScannerComponent.chooseCamera.next(choosenDev);
+  //             this.qrScannerComponent.chooseCamera.next(choosenDev);
 
-          }
+  //         }
 
-          else {
+  //         else {
 
-            this.qrScannerComponent.chooseCamera.next(videoDevices[0]);
+  //           this.qrScannerComponent.chooseCamera.next(videoDevices[0]);
             
-          }
+  //         }
           
-      }
+  //     }
 
-  });
+  // });
 
-  this.qrScannerComponent.capturedQr.subscribe( result => {
+  // this.qrScannerComponent.capturedQr.subscribe( result => {
 
-      var regex = /(\d+)/g;
-      document.getElementsByTagName('video')[0].style.display = 'none';
-      this.codPRODS = result;
+  //     var regex = /(\d+)/g;
+  //     document.getElementsByTagName('video')[0].style.display = 'none';
+  //     this.codPRODS = result;
       
-      console.log(result);
+  //     console.log(result);
 
-      let sliceResult = this.codPRODS.slice(5,20);
-      this.sliceNum = sliceResult.match(regex);
-      localStorage.setItem('cod_prod', this.sliceNum.toString());
+  //     let sliceResult = this.codPRODS.slice(5,20);
+  //     this.sliceNum = sliceResult.match(regex);
+  //     localStorage.setItem('cod_prod', this.sliceNum.toString());
       
-      this.arrNum = {
-        num: this.sliceNum.toString()
-      }
+  //     this.arrNum = {
+  //       num: this.sliceNum.toString()
+  //     }
       
-      this.iDB.createIndexedDB('scanDB', 1);
-      this.iDB.saveDataIndexedDB('scanDB', 1, this.arrNum);
+  //     this.iDB.createIndexedDB('scanDB', 1);
+  //     this.iDB.saveDataIndexedDB('scanDB', 1, this.arrNum);
       
-      if (this.sliceNum.toString() != localStorage.getItem('no_parte'))  {        
+  //     if (this.sliceNum.toString() != localStorage.getItem('no_parte'))  {        
         
-        this.iDB.elBDData('scanDB');
-        console.log('[CODIGO] Es diferente: ' + this.sliceNum.toString() 
-                    + ' ' + localStorage.getItem('no_parte'));
+  //       this.iDB.elBDData('scanDB');
+  //       console.log('[CODIGO] Es diferente: ' + this.sliceNum.toString() 
+  //                   + ' ' + localStorage.getItem('no_parte'));
         
-        Swal.fire({
-         
-         title: 'Are you sure?',
-         text: "You won't be able to revert this!",
-         icon: 'warning',
-         showCancelButton: true,
-         confirmButtonColor: '#3085d6',
-         cancelButtonColor: '#d33',
-         confirmButtonText: 'Si, reiniciar!'
-
-        }).then((result) => {
-
-          localStorage.removeItem('scann_number');
-          localStorage.setItem('scann_number', '0');
-          // this.reiniciarQR();
-
-          if (result.isConfirmed) {
-            Swal.fire(              
-              'Reseteado!',
-              'Valor de scaneo reiniciado.',
-              'success'
-            )
-          }
-          
-        })
+  //       // Swal.fire({
+  //       //  title: 'Are you sure?',
+  //       //  text: "You won't be able to revert this!",
+  //       //  icon: 'warning',
+  //       //  showCancelButton: true,
+  //       //  confirmButtonColor: '#3085d6',
+  //       //  cancelButtonColor: '#d33',
+  //       //  confirmButtonText: 'Si, reiniciar!'
+  //       // }).then((result) => {
+  //       //   localStorage.removeItem('scann_number');
+  //       //   localStorage.setItem('scann_number', '0');
+  //       //   // this.reiniciarQR();
+  //       //   if (result.isConfirmed) {
+  //       //     Swal.fire(
+  //       //       'Reseteado!',
+  //       //       'Valor de scaneo reiniciado.',
+  //       //       'success'
+  //       //     )
+  //       //   }
+  //       // })            
             
-            
-      }
+  //     }
       
-      else {
-        console.log('[CODIGO] Es igual: ' +
-                    this.sliceNum.toString() + ' ' +
-                    localStorage.getItem('cod_prod'));
-      }
-    });
-  }
+  //     else {
+  //       console.log('[CODIGO] Es igual: ' +
+  //                   this.sliceNum.toString() + ' ' +
+  //                   localStorage.getItem('cod_prod'));
+  //     }
+  //   });
+  // }
 
-  reiniciarQR() {
-    window.location.reload();
-  }
+  // reiniciarQR() {
+  //   window.location.reload();
+  // }
 
   
-  changeCamera() {
+  // changeCamera() {
 
-    switch(this.camCont) {
-      case true:
-        this.camCont = false;
-        this.cameraControl('front');
-        console.log(this.camCont)
-        console.log('front')
-        break;
+  //   switch(this.camCont) {
+  //     case true:
+  //       this.camCont = false;
+  //       this.cameraControl('front');
+  //       console.log(this.camCont)
+  //       console.log('front')
+  //       break;
 
-      case false:
-        this.cameraControl('back');
-        this.camCont = true;
-        console.log('back')
-        console.log(this.camCont)
-        break;
+  //     case false:
+  //       this.cameraControl('back');
+  //       this.camCont = true;
+  //       console.log('back')
+  //       console.log(this.camCont)
+  //       break;
 
-      default:
-        this.cameraControl('back');
-        break;
+  //     default:
+  //       this.cameraControl('back');
+  //       break;
 
-    }
+  //   }
 
-  }
+  // }
 
 }

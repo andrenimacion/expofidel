@@ -13,6 +13,7 @@ var sweetalert2_1 = require("sweetalert2");
 var ControlempaqueComponent = /** @class */ (function () {
     function ControlempaqueComponent(lote) {
         this.lote = lote;
+        this.bolup = false;
         this._lote = '0';
         this._QRBool = false;
         this.loteArr = [];
@@ -25,36 +26,56 @@ var ControlempaqueComponent = /** @class */ (function () {
         this.codPRODS = '---';
         this.devices = [];
         this.arrJornDataUnit = [];
-        this.pLabores = false;
-        this.pIngresado = false;
-        this.scannerQR = false;
         /*QR VARS FIN */
+        this._imgVisor = false;
+        this._QrVisor = true;
+        this._TableVisor = false;
         this.count_click = 0;
-        this.reiniciarQR = function () { return window.location.reload(); };
+        this.reiniciarQR = function () { return location.reload(); };
+        this.arrEstate = [];
+        this._canti = 0;
         this.arrLFoto = [];
         this.nimgArr = [];
     }
+    ControlempaqueComponent.prototype.ngOnInit = function () {
+        this.difer = Number(localStorage.getItem('Cantidad')) - Number(localStorage.getItem('pistolNumber'));
+        this.filterLote(this._lote, this.topLote);
+        this._canti = Number(localStorage.getItem('Cantidad'));
+        this._canti = 0;
+        if (this._canti == 0) {
+            sweetalert2_1["default"].fire({
+                position: 'center',
+                icon: 'info',
+                title: 'Escoje un lote para empezar el escaneo',
+                showConfirmButton: true,
+                timer: 2500
+            });
+        }
+    };
     ControlempaqueComponent.prototype.count_click_add = function () {
-        this.count_click += 1;
+        this.count_click += 50;
         localStorage.setItem('pistolNumber', this.count_click.toString());
         this._pistoleada = this.count_click;
-        console.log(this.count_click);
-    };
-    ControlempaqueComponent.prototype.ngOnInit = function () {
-        this.filterLote(this._lote, this.topLote);
-    };
-    ControlempaqueComponent.prototype.activeSound = function () {
-        var a = document.getElementById('soundQR');
-        a.play();
-        console.log('funcion sonido se esta activando');
+        // console.log(this.count_click);
     };
     ControlempaqueComponent.prototype.ngAfterViewInit = function () {
         this.cameraControl(this.camera);
     };
+    ControlempaqueComponent.prototype.visorController = function (a, b) {
+        if (!this._QrVisor) {
+            location.reload();
+        }
+        this._QrVisor = a;
+        this._imgVisor = b;
+        this.bolup = b;
+    };
+    ControlempaqueComponent.prototype.activeSound = function () {
+        var a = document.getElementById('soundQR');
+        a.play();
+    };
     ControlempaqueComponent.prototype.cameraControl = function (a) {
         var _this = this;
         this.qrScannerComponent.getMediaDevices().then(function (devices) {
-            // console.log(devices);
             var videoDevices = [];
             for (var _i = 0, devices_1 = devices; _i < devices_1.length; _i++) {
                 var device = devices_1[_i];
@@ -74,14 +95,6 @@ var ControlempaqueComponent = /** @class */ (function () {
                     }
                     else {
                         choosenDev = dev;
-                        sweetalert2_1["default"].fire({
-                            position: 'center',
-                            icon: 'error',
-                            title: "" + _this.messageCam,
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                        _this.messageCam = 'No tiene camara posterior';
                     }
                 }
                 if (choosenDev) {
@@ -96,12 +109,54 @@ var ControlempaqueComponent = /** @class */ (function () {
             var regex = /(\d+)/g;
             document.getElementsByTagName('video')[0].style.display = '';
             document.getElementsByTagName('video')[0].controls = true;
-            _this.codPRODS = result;
+            var PRODUCTION = function () {
+                _this.lote.getloteFilterExec(result, 1).subscribe(function (execlote) {
+                    _this.resLote = execlote[0].resultado;
+                    _this._lote = _this.resLote;
+                    console.log(_this._lote);
+                });
+                _this.lote.getloteFilterExec(result, 2).subscribe(function (execprod) {
+                    _this.resCPro = execprod[0].resultado;
+                    console.log(_this.resCPro);
+                });
+                setTimeout(function () {
+                    _this.lote.getloteFilterNProd(_this._lote, _this.resCPro).subscribe(function (prod) {
+                        console.log('///////////////////////////////');
+                        console.log(prod);
+                        console.log('///////////////////////////////');
+                    }, function (err) {
+                        console.log(err);
+                        console.log('ALGO HA SALIDO MAL');
+                    });
+                }, 1000);
+            };
+            PRODUCTION();
+            localStorage.setItem('Result-scann-codec', _this.codPRODS);
+            _this.controlLoteDifer(localStorage.getItem('Result-scann-codec'));
             _this.activeSound();
-            // var count = 0
-            // console.log( count++ );
-            console.log(result);
             _this.count_click_add();
+            _this.loteEstado('T', localStorage.getItem('comprobante-tipo'), localStorage.getItem('comprobante-numero'));
+            _this.difer = Number(localStorage.getItem('Cantidad')) - Number(localStorage.getItem('pistolNumber'));
+            var canthalf = Number(localStorage.getItem('Cantidad')) / 2;
+            if (_this.difer <= 0) {
+                _this.difer = 0;
+                var Toast = sweetalert2_1["default"].mixin({
+                    toast: true,
+                    position: 'center',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: function (toast) {
+                        toast.addEventListener('mouseenter', sweetalert2_1["default"].stopTimer);
+                        toast.addEventListener('mouseleave', sweetalert2_1["default"].resumeTimer);
+                    }
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: "Haz culminado con \u00E9xito " + localStorage.getItem('Lote') + " "
+                });
+                _this.filterLote('0', _this.topLote);
+            }
             var sliceResult = _this.codPRODS.slice(5, 20);
             _this.sliceNum = sliceResult.match(regex);
             localStorage.setItem('cod_prod_lote', _this.sliceNum.toString());
@@ -109,6 +164,20 @@ var ControlempaqueComponent = /** @class */ (function () {
                 num: _this.sliceNum.toString()
             };
         });
+    };
+    ControlempaqueComponent.prototype.showReport = function () {
+    };
+    ControlempaqueComponent.prototype.controlLoteDifer = function (b) {
+        if (this._lote != b) {
+            sweetalert2_1["default"].fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'No podemos proceder por que el código QR es diferente al Lote seleccionado',
+                footer: 'Selecciona el lote correspondiente al código QR o viceversa.'
+            });
+        }
+        // else {     
+        // }
     };
     ControlempaqueComponent.prototype.changeCamera = function () {
         switch (this.camCont) {
@@ -133,16 +202,35 @@ var ControlempaqueComponent = /** @class */ (function () {
         var _this = this;
         this.lote.getLoteFilter(lote, top).subscribe(function (l) {
             _this.loteArr = l;
-            console.log(_this.loteArr);
+            // console.log('this.loteArr-------------INICIO');
+            // console.log(this.loteArr);
+            // console.log('this.loteArr-------------FIN');
+            _this.difer = 0;
+            // console.log(comprobante);
+            //this.loteEstado('E', tipo, numero);
         });
     };
-    ControlempaqueComponent.prototype.getLote = function (l, j, c) {
-        console.log(l);
+    ControlempaqueComponent.prototype.loteEstado = function (estadolote, tipo, numero) {
+        var _this = this;
+        this.lote.updateEstate(estadolote, tipo, numero).subscribe(function (x) {
+            _this.arrEstate = x;
+            console.log(_this.arrEstate);
+            _this.filterLote('0', 50);
+        });
+    };
+    ControlempaqueComponent.prototype.getLote = function (l, j, c, comprobante) {
         localStorage.setItem('LoteSelect', l);
         localStorage.setItem('Lote', j);
+        localStorage.setItem('Cantidad', c);
         this.getimgnparte(l);
         this._canti = c;
         this._lote = j;
+        this.compSliceA = comprobante.slice(0, -8);
+        this.compSliceB = comprobante.slice(2);
+        localStorage.setItem('comprobante-tipo', this.compSliceA);
+        localStorage.setItem('comprobante-numero', this.compSliceB);
+        this.loteEstado('E', localStorage.getItem('comprobante-tipo'), localStorage.getItem('comprobante-numero'));
+        this.filterLote('0', 50);
     };
     ControlempaqueComponent.prototype.encodeImageFileAsURL = function () {
         var _this = this;
@@ -168,9 +256,8 @@ var ControlempaqueComponent = /** @class */ (function () {
             no_parte_i: localStorage.getItem('LoteSelect'),
             img_no_parte: this._IMGE
         };
-        // console.log(this.arrLFoto);
         this.lote.upimg(localStorage.getItem('LoteSelect'), this.arrLFoto).subscribe(function (upf) {
-            console.log(upf);
+            // console.log(upf);
             sweetalert2_1["default"].fire({
                 icon: 'success',
                 title: 'Bien!...',

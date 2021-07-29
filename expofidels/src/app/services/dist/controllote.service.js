@@ -22,6 +22,16 @@ var ControlloteService = /** @class */ (function () {
     ControlloteService.prototype.getimgbyNparte = function (nparte) {
         return this.http.get(this.apiURL + '/products/getLoteimg/' + nparte);
     };
+    // http://localhost:5000/api/products/estadoLote/T/EM/00000001
+    ControlloteService.prototype.updateEstate = function (estadolote, tipo, numero) {
+        return this.http.get(this.apiURL + '/products/estadoLote/' + estadolote + '/' + tipo + '/' + numero);
+    };
+    ControlloteService.prototype.getloteFilterExec = function (filter, opts) {
+        return this.http.get(this.apiURL + '/products/getLoteFilter/' + filter + '/' + opts);
+    };
+    ControlloteService.prototype.getloteFilterNProd = function (filter, noparte) {
+        return this.http.get(this.apiURL + '/products/getLoteCodNpart/' + filter + '/' + noparte);
+    };
     ControlloteService = __decorate([
         core_1.Injectable({
             providedIn: 'root'

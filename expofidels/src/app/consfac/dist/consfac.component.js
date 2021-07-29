@@ -204,7 +204,6 @@ var ConsfacComponent = /** @class */ (function () {
                         cantidad: localStorage.getItem("scann-" + v_1)
                     };
                     _this.saveDetalle(_this.arrDetSave);
-                    //console.log(this.arrDetSave);
                 }
                 setTimeout(function () {
                     console.log('EXEC');
@@ -237,7 +236,7 @@ var ConsfacComponent = /** @class */ (function () {
             txtPara: "andrenimacion@gmail.com",
             txtAsunto: "Reporte de despacho: " + this._n_reporte + " ",
             txtCopia: "syscompsasa@gmail.com",
-            txtMensaje: "<div style=\"padding: 15px; border: solid 2px gray; \n                    border-top-right-radius: 5px; border-top-left-radius: 5px;\">\n                      <div>\n                        <div> <strong> Reporte de despacho: </strong> " + this._n_reporte + " </div>\n                        <div> <strong> Cliente: </strong> " + this._cliente + " </div><hr>\n                      </div>\n                      <div>\n                        <div> <strong> Direcci\u00F3n: </strong> " + this._direccion + "</div>\n                        <div> <strong> Bodega: </strong> " + this._bodega + " </div><hr>\n                      </div>\n                      <div>\n                        <div> <strong> Concepto: </strong> " + this._concepto + "</div>\n                        <div> <strong> R.U.C.: </strong> " + this._ruc + " </div><hr>\n                      </div>\n                      <div>\n                        <div> <strong> Telefono: </strong> " + this._telefono + "</div>\n                        <div> <strong> Emision: </strong> " + this._emision + "</div><hr>\n                      </div>                      \n                    </div>\n                    <hr>\n                    <div>\n                    <table style=\"width: 100%;\">\n                    <thead style='background-color: #444; color: white;'>\n                    <th>Detalle</th>\n                    <th>Cantidad</th>\n                    <th>Despachado</th>\n                    <th>Total</th>\n                    </thead>\n                    <tbody style='background-color: #FAC193;'>\n                      " + tbodyReport + "\n                    </tbody>\n                    </table>\n                    <hr style=\"border: dotted 2px gray;\">\n                    Fecha de vencimiento: " + this._f_vencimiento + "\n                    <h5><strong> POFIDEL - " + new Date() + " - ECUADOR </strong></h5>\n                    <strong>Nota:</strong> No responder este email...\n                   </div>",
+            txtMensaje: "<div style=\"padding: 15px; border: solid 2px gray; \n                    border-top-right-radius: 5px; border-top-left-radius: 5px;\">\n                      <div>\n                        <div> <strong> Reporte de despacho: </strong> " + this._n_reporte + " </div>\n                        <div> <strong> Cliente: </strong> " + this._cliente + " </div><hr>\n                      </div>\n                      <div>\n                        <div> <strong> Direcci\u00F3n: </strong> " + this._direccion + "</div>\n                        <div> <strong> Bodega: </strong> " + this._bodega + " </div><hr>\n                      </div>\n                      <div>\n                        <div> <strong> Concepto: </strong> " + this._concepto + "</div>\n                        <div> <strong> R.U.C.: </strong> " + this._ruc + " </div><hr>\n                      </div>\n                      <div>\n                        <div> <strong> Telefono: </strong> " + this._telefono + "</div>\n                        <div> <strong> Emision: </strong> " + this._emision + "</div><hr>\n                      </div>                      \n                    </div>\n                    <hr>\n                    <div>\n                    <table style=\"width: 100%;\">\n                    <thead style='background-color: #444; color: white;'>\n                    <th>Detalle</th>\n                    <th>Cantidad</th>\n                    <th>Despachado</th>\n                    <th>Total</th>\n                    </thead>\n                    <tbody style='background-color: #FAC193;'>" + tbodyReport + "</tbody>\n                    </table>\n                    <hr style=\"border: dotted 2px gray;\">\n                    Fecha de vencimiento: " + this._f_vencimiento + "\n                    <h5><strong> POFIDEL - " + new Date() + " - ECUADOR </strong></h5>\n                    <strong>Nota:</strong> No responder este email...\n                   </div>",
             MailAddress: "syscompsasa@gmail.com",
             passwordMail: "sysgye2016",
             date_send_mail: new Date()
@@ -303,31 +302,12 @@ var ConsfacComponent = /** @class */ (function () {
                 console.log(localStorage.setItem("diferencia-" + mi, (Number(this.arrFacts[mi++].cantidad) - Number(c.value)).toString()));
             }
         }
-        // if(a > localStorage.getItem('p_cantidad')) {
-        //   this.scaningQR = Number(localStorage.getItem('p_cantidad'));
-        //   const Toast = Swal.mixin({
-        //     toast: true,
-        //     position: 'top-end',
-        //     showConfirmButton: false,
-        //     timer: 5000,
-        //     timerProgressBar: true,
-        //     didOpen: (toast) => {
-        //       toast.addEventListener('mouseenter', Swal.stopTimer)
-        //       toast.addEventListener('mouseleave', Swal.resumeTimer)
-        //     }
-        //   })
-        //   Toast.fire ({
-        //     icon: 'info',
-        //     title: 'Haz eccedido el limite de escaneos con relación a la cantidad estipulada'
-        //   })
-        //   b.disabled = true;
-        // }
     };
     ConsfacComponent.prototype.getFactsUnit = function (type, top) {
         var _this = this;
         this.dataFact.getfacttype(type, top).subscribe(function (typef) {
             _this.arrFactsType = typef;
-            console.log(_this.arrFactsType);
+            //console.log(this.arrFactsType);
         }, function (err) {
             sweetalert2_1["default"].fire({
                 title: 'No se pudo concretar tu busqueda',

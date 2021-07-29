@@ -248,11 +248,10 @@ export class ConsfacComponent implements OnInit {
               tempo:    "despacho",
               linea:    this.arrFacts[v].linea,
               no_parte: this.arrFacts[v].no_parte,
-              cantidad: localStorage.getItem(`scann-${v}`)
+              cantidad: localStorage.getItem(`scann-${v}`)          
             }
-
+            
             this.saveDetalle(this.arrDetSave);
-            //console.log(this.arrDetSave);
           
           }
 
@@ -270,15 +269,13 @@ export class ConsfacComponent implements OnInit {
           v.removeChild(atr);
         }
       }, 1500);
-      
 
     }, (err) => {
-
         console.log(err);
-
     })
     
   }
+
   //#endregion
 
   saveDetalle(content) {
@@ -328,9 +325,7 @@ export class ConsfacComponent implements OnInit {
                     <th>Despachado</th>
                     <th>Total</th>
                     </thead>
-                    <tbody style='background-color: #FAC193;'>
-                      ${tbodyReport}
-                    </tbody>
+                    <tbody style='background-color: #FAC193;'>${tbodyReport}</tbody>
                     </table>
                     <hr style="border: dotted 2px gray;">
                     Fecha de vencimiento: ${this._f_vencimiento}
@@ -486,42 +481,17 @@ export class ConsfacComponent implements OnInit {
     
     let b = document.getElementsByTagName('input');    
     let ta = document.getElementsByTagName('textarea');    
-    for ( let mi = 0; mi < 1000; mi++ ) {
-      
+    for ( let mi = 0; mi < 1000; mi++ ) {      
       for ( let ma: number = 8; ma < b.length; ma ++ ) {
 
             b[ma].setAttribute('id', `id-${ma}`);
             let c = <HTMLInputElement> document.getElementById(`id-${ma}`);
             localStorage.setItem(`scan-qr-${ma}`, (Number(c.value)).toString());
-
             console.log(localStorage.setItem(`diferencia-${mi}`, (Number(this.arrFacts[mi++].cantidad) - Number(c.value)).toString()));
 
           }
           
-        }
-        
-        // if(a > localStorage.getItem('p_cantidad')) {
-          //   this.scaningQR = Number(localStorage.getItem('p_cantidad'));
-          //   const Toast = Swal.mixin({
-            //     toast: true,
-            //     position: 'top-end',
-            //     showConfirmButton: false,
-            //     timer: 5000,
-            //     timerProgressBar: true,
-            //     didOpen: (toast) => {
-              //       toast.addEventListener('mouseenter', Swal.stopTimer)
-              //       toast.addEventListener('mouseleave', Swal.resumeTimer)
-              //     }
-              //   })
-              
-              //   Toast.fire ({
-                //     icon: 'info',
-                //     title: 'Haz eccedido el limite de escaneos con relación a la cantidad estipulada'
-                //   })
-                
-                //   b.disabled = true;
-                
-                // }
+        }    
                 
   }
               
@@ -529,7 +499,7 @@ export class ConsfacComponent implements OnInit {
   getFactsUnit( type, top ) {
     this.dataFact.getfacttype(type, top).subscribe( typef => {
       this.arrFactsType = typef;
-      console.log(this.arrFactsType);
+      //console.log(this.arrFactsType);
     }, (err)=> {      
       Swal.fire({
         

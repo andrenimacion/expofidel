@@ -65,6 +65,7 @@ import { LoginComponent } from './login/login.component';
 import { HeaderComponent } from './header/header.component';
 import { ReporteComponent } from './reporte/reporte.component';
 import { ControlempaqueComponent } from './controlempaque/controlempaque.component';
+import { TransferenciabodComponent } from './transferenciabod/transferenciabod.component';
 
 @NgModule({
   declarations: [
@@ -78,6 +79,7 @@ import { ControlempaqueComponent } from './controlempaque/controlempaque.compone
     HeaderComponent,
     ReporteComponent,
     ControlempaqueComponent,
+    TransferenciabodComponent,
   ],
   imports: [
     NgQrScannerModule,
