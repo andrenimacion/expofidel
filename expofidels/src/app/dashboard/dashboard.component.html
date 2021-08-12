@@ -1,6 +1,7 @@
 <!-- <div id="mesasge" class="container-fluid p-0 m-0"></div> -->
 <app-header></app-header>
-<section class="header" [ngStyle]="{'height': height + 'px'}" >
+
+<section class="header"  >
 
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
         <mat-icon>chevron_right  </mat-icon>
@@ -8,7 +9,9 @@
 
     <div class="offcanvas offcanvas-start" style="overflow-y: auto !important;" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
         <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Menú de acciones</h5>
+          <h5 class="offcanvas-title d-flex justify-content-stretch align-items-center" id="offcanvasWithBothOptionsLabel">
+            <mat-icon> settings </mat-icon> Configuración
+          </h5>
           <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         
@@ -54,17 +57,18 @@
             <mat-expansion-panel (opened)="panelOpenState = true"
                                  (closed)="panelOpenState = false">
               <mat-expansion-panel-header>
-                <mat-panel-title>                  
+                <mat-panel-title class="d-flex align-items-center">                  
                     <mat-icon>fact_check</mat-icon>
-                    <p class="title">
-                         Transacciones por sincronizar                        
+                    <p class="title p-0 m-0">
+                      Configuración de Tipo de control
                     </p>
+                    <span class="notes">
+                      Edita el (Código-prefijo) tipo de control de empague.
+                    </span>
                 </mat-panel-title>
-                <mat-panel-description>
-                </mat-panel-description>
+                <mat-panel-description></mat-panel-description>
               </mat-expansion-panel-header>
-                <app-offline-data>
-                </app-offline-data>              
+                <app-control-estate-control-emp></app-control-estate-control-emp>
             </mat-expansion-panel>
         </mat-accordion>
 

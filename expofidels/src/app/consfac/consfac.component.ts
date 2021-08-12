@@ -1,4 +1,4 @@
-import { Component, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { ControlprodService } from '../services/controlprod.service';
 import { IndexedDBService } from '../services/indexed-db.service';
 import Swal from 'sweetalert2';
@@ -18,8 +18,7 @@ import { EmailServicesService } from '../services/email-services.service';
 export class ConsfacComponent implements OnInit {
 
   //foter INICIO
-   public _footer = `POFIDEL - `;
-  
+  public _footer = `POFIDEL - `;
   //foter FIN
 
   //var report INICIO
@@ -39,8 +38,7 @@ export class ConsfacComponent implements OnInit {
   public _name: string;
   public scaningQR: number;
   public total: any;
-  public db;
-  
+  public db;  
   //#region persistencia de datos para la tabla  
   public codigo;
   public nombre;
@@ -49,8 +47,7 @@ export class ConsfacComponent implements OnInit {
   public diferencia;  
   //#endregion 
   public typeGen: string;
-  public arrCursorFact:any = [];
-  
+  public arrCursorFact:any = [];  
   /* ----------------------- variables para transacciones INICIO -------------------------------------------- */
   //#region 
   public arrCabSave: any = [];
@@ -95,6 +92,10 @@ export class ConsfacComponent implements OnInit {
   //contenido de tabla a enviar por email
   public tableSend;
 
+
+
+  
+
   constructor( public dataFact: ControlprodService,
                public iDB: IndexedDBService,
                private desSave: TInvcabgControllerService,
@@ -105,16 +106,13 @@ export class ConsfacComponent implements OnInit {
   ngOnInit() {
     this.removesecuenceLocalStorage(1000);
     this.getFactType('0', '50');
-    //this.datesNow();
+
     this.dbREAD('scanDB');
     this.scaningQR = Number(localStorage.getItem('scann_number'));
     this._bodega = localStorage.getItem('bodega');
     this._typ = localStorage.getItem('tipo');
     this._options = localStorage.getItem('factura_number');
     this._name = localStorage.getItem('nomCliente');
-
-    //var tbodyRes = document.getElementById('tbody-arr');
-    //console.log(tbodyRes);
 
     this.emServGen.getEmail().subscribe( email =>
     {
@@ -187,16 +185,13 @@ export class ConsfacComponent implements OnInit {
       const transaction =  db.transaction([bd], 'readwrite');
       const objectStore = transaction.objectStore(bd);
       objectStore.openCursor().onsuccess = (e) => {
-
       const cursor = e.target.result; 
-
         if( cursor ) {        
           this.arrCursor.push(cursor.value);
           cursor.continue();
           this.scaningQR = this.arrCursor.length;
           localStorage.setItem(bd, this.scaningQR.toString());
         }
-
       }
     }
 
@@ -224,7 +219,6 @@ export class ConsfacComponent implements OnInit {
       usercla: sessionStorage.getItem('Token-User'),
       referencia: this.sliceNameFact + this.sliceNameFactB
     }
-
     
     this.desSave.despachoSaveCab(this.arrCabSave).subscribe( scab => {     
 
@@ -276,6 +270,14 @@ export class ConsfacComponent implements OnInit {
     
   }
 
+ 
+  public sliceResult: string;
+  public resLote: string;
+  public resCPro;
+
+  
+  
+
   //#endregion
 
   saveDetalle(content) {
@@ -286,6 +288,30 @@ export class ConsfacComponent implements OnInit {
         this._reportBool = true;
       }
     )
+  }
+
+  public arrLNpart: any = []; 
+  public boolLotes: boolean = false;
+  public arrLNpartCount: number;
+  public n_parte;
+  getLNpart(nparte) {
+    this.dataFact.getLotesProdDespacho(nparte).subscribe( m => {
+
+      this.arrLNpart = m;
+      this.arrLNpartCount = this.arrLNpart.length;
+
+      if( this.arrLNpartCount == 0 ) {
+        Swal.fire(
+          'No tienes productos',
+          '',
+          'warning'
+        )
+      }
+
+      this.n_parte = this.arrLNpart[0].no_parte; 
+      console.log(this.arrLNpart);
+
+    })
   }
 
 
@@ -374,7 +400,6 @@ export class ConsfacComponent implements OnInit {
       this.arrCursor = exec;
       // console.log(this.arrCursor);
       for(let i = 0; i <= this.arrCursor.length; i++ ) {
-
         //---------------------------------------------------------------
         //bucle para recorre la cabecera
         this._n_reporte = ` #${this.arrCursor[i].tipo + this.arrCursor[i].numero}`;
@@ -415,69 +440,9 @@ export class ConsfacComponent implements OnInit {
 
     })
   }
-
-  // public exeReportArr: any = [];
-  // execReport() {    
-
-  //   // console.log(localStorage.getItem('Comprobante-type'), localStorage.getItem('Comprobante-number'));
-
-  //   this.desSave.getExecReport(sessionStorage.getItem('Session-Key'), 'despacho').subscribe (execr => {
-
-  //     this.exeReportArr = execr;
-  //     //this.getComprobantController(this.exeReportArr);
-  //     console.log(this.exeReportArr);
-
-  //   })
-  // } 
-
-  //this.exec(sessionStorage.getItem('Session-Key'), 'despacho')
-  // controlSaveDataObserver() {
-  
-  //   this.observable = new Observable(subscriber => {
-  //     subscriber.next(this.saveDespachos());
-  //     subscriber.complete();
-
-  //   });
-  
-  //   this.rxjsFunction();
-  
-  // }
-
-  // rxjsFunction() {
     
-  //   this.observable.subscribe({
-  //     next(x) { x },
-  //     error(err) { console.error('Ha ocurrido un error de ejecución: ' + err); },
-  //     complete() {
-        
-  //       const Toast = Swal.mixin({
-  //         toast: true,
-  //         position: 'top-start',
-  //         showConfirmButton: false,
-  //         timer: 5000,
-  //         timerProgressBar: true,
-  //         didOpen: (toast) => {
-  //           toast.addEventListener('mouseenter', Swal.stopTimer)
-  //           toast.addEventListener('mouseleave', Swal.resumeTimer)
-  //         }
-  //       })
-        
-  //       Toast.fire({
-  //         icon: 'success',
-  //         html: `Transacción guardada exitosamente
-  //                con token:<strong>${sessionStorage.getItem('Session-Key')}</strong>`
-  //               })
-
-  //      }
-
-  //     });
-      
-  // }
-    
-  public _value: any = 0; 
-  valdeteScann() {    
-    // localStorage.setItem('p_diferen', a);
-    //this.total = localStorage.getItem('p_diferen');
+  public _value: any = 0;
+  valdeteScann() {
     
     let b = document.getElementsByTagName('input');    
     let ta = document.getElementsByTagName('textarea');    
@@ -526,6 +491,7 @@ export class ConsfacComponent implements OnInit {
     //let z = <HTMLInputElement> document.getElementById('scann');
     this.dataFact.getfactura(a,b,c,d).subscribe( FACTS => {
       this.arrFacts = FACTS;
+      console.log( 'Este es el resultado de FACTS' )
       console.log(this.arrFacts);
 
       //variables para localstorage

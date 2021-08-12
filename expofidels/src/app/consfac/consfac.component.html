@@ -1,3 +1,67 @@
+
+<div *ngIf="boolLotes" id="tableDes">
+  
+  <button type="button" class="btn-close bg-danger " 
+          style="float: right; "
+          (click)="boolLotes = !boolLotes" aria-label="Close">
+  </button>
+  <div class="tableFixHead" >
+
+    <div class="heads d-flex flex-column">
+    <div class="dropdown">
+      <a class="btn btn-secondary dropdown-toggle"
+         href="#" role="button" id="dropdownMenuLink"
+         data-bs-toggle="dropdown" aria-expanded="false">
+        Cod. Prods.:
+      </a>
+    
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <li *ngFor="let mix of arrFacts" (click)="getLNpart(mix.no_parte)" >
+          {{mix.no_parte}}
+        </li>
+      </ul>
+    </div>
+
+
+    <div class="section" style="color: white;">
+       Cod. Prod.: <strong class="text-info"> {{n_parte}} </strong> / Cant.: <strong class="text-info"> {{arrLNpartCount}} </strong>
+    </div>
+  </div>
+  <div class="scan">
+
+      <qr-scanner [debug]="false" [canvasWidth]="250"
+                  [canvasHeight]="220" [stopAfterScan]="true"
+                  [updateTime]="200" >
+      </qr-scanner>
+
+      <audio id="audio" controls id="soundQR">
+          <source src="../../assets/scanQR.mp3">
+      </audio>
+
+    </div>
+    <table class="table table-dark table-hover">
+      <thead class="bg-primary" >
+        <th>Lote</th>
+        <th>Cant. Disponible</th>
+      </thead>
+      <tbody>
+
+        <tr *ngFor=" let x of arrLNpart ">
+          <td>
+            {{x.lote}}
+          </td>
+          <td>
+            {{x.disponible}}
+          </td>
+        </tr>
+
+      </tbody>
+    </table>    
+  </div>
+
+</div>
+
+
 <div class="menu mb-3" >
     <mat-form-field appearance="fill">
       <mat-label>Refer:</mat-label>
@@ -72,6 +136,22 @@
             mat-raised-button color="accent">
 
        <mat-icon>double_arrow</mat-icon> Guardar
+
+    </button>
+
+    <button (click)="boolLotes = !boolLotes" 
+            style="border-radius: 0px !important; font-size: 8pt !important;"
+            mat-raised-button color="primary">
+
+       <mat-icon>assignment</mat-icon> Lotes
+
+    </button>
+
+    
+    <button style="border-radius: 0px !important; font-size: 8pt !important;"
+            mat-raised-button color="basic">
+
+       <mat-icon>qr_code_scanner</mat-icon> QR
 
     </button>
 

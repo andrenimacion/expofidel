@@ -1,24 +1,20 @@
-
-
-<!-- 
+<!--
 <div class="container-fluid p-3">
     <mat-form-field class="example-full-width">
-
         <mat-label>Filtro por Lote:</mat-label>
-
         <input matInput placeholder="Lote"
                [(ngModel)]="_lote"
                (keyup.enter)="filterLote(_lote, 50)">
-
     </mat-form-field>
+</div>
+
+<div class="btnMin" (click)=" _TableVisor = !_TableVisor">
+    <mat-icon>article</mat-icon> Elegir lotes
 </div> -->
 
-<!-- <div class="btnMin" (click)=" _TableVisor = !_TableVisor">
-    <mat-icon>article</mat-icon> Elegir lotes
-</div>
- -->
 <div class="dashContEmp container-fluid p-3">    
-    <div class="visor">
+    <div class="visor">       
+
         <div class="btnSetts">
 
             <button class="btn btn-warning btn-sm" (click)="visorController(false, true)" 
@@ -56,15 +52,17 @@
                 <!--<span class="note" style="font-size: 12pt;">visor QR</span>-->
                 <div class="contsQR animated fadeIn fast">
                     <div class="contapp">                    
-                    <div class="scan" (click)="activeSound()">
+                    <div class="scan">
+                        
                         <qr-scanner [debug]="false" [canvasWidth]="250"
-                                    [canvasHeight]="220" [stopAfterScan]="false"
-                                    [updateTime]="50" >
+                                    [canvasHeight]="220" [stopAfterScan]="true"
+                                    [updateTime]="200" >
                         </qr-scanner>
 
                         <audio id="audio" controls id="soundQR">
                             <source src="../../assets/scanQR.mp3">
-                        </audio>                    
+                        </audio>
+
                     </div>
                     <label id="labll" style="color: white; font-size: 9pt;" class="p-3">
                         <span class="text-info"> Contenido escaneado:</span><br>{{resGen}}
@@ -75,9 +73,8 @@
     <!-- QR CODE FIN -->
     </div>
 </div>
-        <div class="tablerep mt-2">
-
-            <table class="table table-bordered table-hover" >
+        <div class="tablerep mt-2 table-responsive">
+            <table class="table table-bordered table-hover table align-middle" >
                 <thead>
                     <th>Lote        </th>
                     <th>Cantidad    </th>
@@ -86,50 +83,130 @@
                 </thead>
                 <tbody class="table-warning">
                     <tr>
-                        <td> {{_lote}}  </td>
-                        <td>
-                            {{_canti}}
-                        </td>
-                        <td>
-                            <input type="number" class="form-control"
-                                   [(ngModel)]="_escane" name="_canti"
-                                   style="color: black !important;" placeholder="0" (change)="operLote(_canti, _escane)" >
-                        </td>
-                        <td> {{difer | number : '1.2-2'}}  </td>
+                      <td> {{_lote}}  </td>
+                      <td> {{_canti}} </td>
+                      <td>
+                          <input type="number" class="form-control"
+                                 [(ngModel)]="_escane" name="_canti"
+                                 style="color: black !important; width: 80px;"
+                                 placeholder="0"
+                                 (keyup) = "operLote(_canti, _escane)"
+                                 (change)= "operLote(_canti, _escane)">
+                      </td>
+                      <td>{{difer | number : '1.2-2'}}</td>
                     </tr>
                 </tbody>
+                <button disabled class="btn btn-warning d-flex justify-content-center f-6 w-100 align-items-center"
+                     style="float: right;" id="ajusteButton"  (click)="adjustmentAuto(); loteEstado('T', compSliceA, compSliceB)" >
+                     <mat-icon>receipt_long</mat-icon> Ajuste
+                </button>
             </table>
-
         </div>
     </div>
-    <div class="tables" *ngIf="_TableVisor">      
-    
-        <mat-icon style="color: orangered; cursor: pointer; float: right;" (click)="_TableVisor = !_TableVisor">
-            cancel
-        </mat-icon>
-    
-        <table class="table table-bordered table-hover">
-            
+    <div class="tables" *ngIf="_TableVisor">
+        <div class="d-flex justify-content-between">   
+            <div class="inpsTopLote">
+                <label>
+                    <span class="note p-2">
+                        <mat-icon>format_list_numbered</mat-icon>
+                        Número lotes a mostrar:
+                    </span>
+                </label>
+                <input type="number" [(ngModel)]="topLote"
+                     style="color: dimgrey !important;"
+                     class="inpsTopLote form-control"
+                     (change)="filterLote('0', '0', topLote)">
+                     Cant. {{cantLote}} de
+                     <strong> {{cantLoteB}}</strong>
+            </div>
+        </div>
+        <table class="table table-bordered table-hover">            
             <thead>
-                <th> Lote </th>
-                <th> Descripción </th>
-                <th> Estado </th>
+                <th title="Codódigo de bodegas">Bod.</th>
+                <th>             Lote               </th>
+                <th>             Descripción        </th>
+                <th>             Estado             </th>
             </thead>
-            
-            <tbody class="table-primary">
-                <tr *ngFor="let x of loteArr" (click)="getLote(x.no_parte, x.lote, x.cantidad, x.comproba)">
-                    <td>
-                        {{ x.lote }}
-                    </td>
-                    <td>
-                        {{ x.nomParte }}
-                    </td>
-                    <td class="tds" [ngStyle]="{'background-color': x.colorTable}" >
-                        {{ x.estado_lote }}
+            <tbody class="table-primary"  >
+                <tr *ngFor="let x of loteArr"
+                    (click)="getLote(x.lote, x.lote, x.cantidad, x.comproba);
+                             loteEstado('E', compSliceA, compSliceB)"
+                    (dblclick)="loteEstado('-', compSliceA, compSliceB)">
+                    <td>{{ x.bodega }}</td>
+                    <td>{{ x.lote }}</td>
+                    <td>{{ x.nomParte }}</td>
+                    <td class="tds" [ngStyle]="{'background-color': x.colorTable}">
+                         {{ x.estado_lote }}
                     </td>
                 </tr>
-            </tbody>
-    
+            </tbody>    
         </table>
     </div>
 </div>
+<!-- _reportBool -->
+<div class="example-box" id="exbox" cdkDrag *ngIf="_reportBool">
+    <div class="heads">
+      <div class="btnsetts">
+        <div class="btns"
+             title="cerrar"
+             (click)="_reportBool = !_reportBool">
+             <mat-icon>disabled_by_default</mat-icon>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid" >
+      
+      <p class="number-note text-danger fs-2"
+         style="font-weight: bold; margin: 0px;">
+         N.: {{numeracion}}
+      </p>
+        <hr>
+      <div class="title">
+        <p>Ajuste por empaque</p>
+        <p class="number-note fs-5 text-primary">Tipo Transac.:{{_n_reporte}}</p>
+      </div>  
+      
+      <div class="head container-fluid">
+          <div class="he1">
+             <strong> Bodega: </strong>{{_bodega}}<br>     
+             <strong> Concepto: </strong> {{_concepto}}<br>   
+             <strong> Emisión: </strong> {{_emision | date: 'short'}} <br>
+          </div>
+
+          <div class="he2">
+          </div>
+
+      </div>
+  
+      <div class="table-responsive" id="tabRespons">
+          <table class="table table-bordered
+                    table-dark table-hover
+                    align-middle
+                    table-sm">
+            <thead>
+                <tr>
+                    <th>  Cod-Prod.  </th>
+                    <th>  Detalle    </th>
+                    <th>  Cantidad   </th>
+                </tr>
+            </thead>
+            <tbody class="table-warning table-bordered" id="domtab">
+                <tr *ngFor="let ja of arrAs">
+                    <td> {{ ja.no_parte }} </td>
+                    <td> {{ ja.des_noparte }} </td>
+                    <td> {{ ja.cantidad }} </td>
+                </tr>
+            </tbody>
+          </table>
+      </div>  
+      <footer id="foot">
+        <p class="foottext">{{_footer}} {{_dateNow | date: 'short' }} </p>
+      </footer>  
+    </div>
+  
+  </div>
+
+
+
+
+

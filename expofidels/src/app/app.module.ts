@@ -66,6 +66,7 @@ import { HeaderComponent } from './header/header.component';
 import { ReporteComponent } from './reporte/reporte.component';
 import { ControlempaqueComponent } from './controlempaque/controlempaque.component';
 import { TransferenciabodComponent } from './transferenciabod/transferenciabod.component';
+import { ControlEstateControlEmpComponent } from './control-estate-control-emp/control-estate-control-emp.component';
 
 @NgModule({
   declarations: [
@@ -80,6 +81,7 @@ import { TransferenciabodComponent } from './transferenciabod/transferenciabod.c
     ReporteComponent,
     ControlempaqueComponent,
     TransferenciabodComponent,
+    ControlEstateControlEmpComponent,
   ],
   imports: [
     NgQrScannerModule,
@@ -133,22 +135,17 @@ import { TransferenciabodComponent } from './transferenciabod/transferenciabod.c
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule.forRoot([
+    RouterModule.forRoot([      
       { path: 'dash',   component: DashboardComponent },
       { path: 'reporttransac',    component: ReporteComponent },
       { path: 'controlempaque',   component: ControlempaqueComponent },
       { path: 'Login',  component: LoginComponent, pathMatch: 'full' },
       { path: '**',     pathMatch: 'full', redirectTo: 'Login'  }
     ]),
-
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
-  
   ],
-
   providers: [],
   bootstrap: [AppComponent]
-
 })
-
 export class AppModule { }

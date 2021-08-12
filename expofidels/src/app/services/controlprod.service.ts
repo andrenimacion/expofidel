@@ -27,4 +27,8 @@ export class ControlprodService {
     this.iDB.saveDataIndexedDB('facturas-type-DB',1, data);    
   }
 
+  getLotesProdDespacho(nparte) {
+    return this.http.get( this.urlapi + `products/getLotesProdDespacho/${nparte}`);
+  }
+
 }

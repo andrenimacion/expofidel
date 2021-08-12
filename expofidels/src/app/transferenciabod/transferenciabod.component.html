@@ -1,24 +1,43 @@
 
+    
+    <!-- <div class="unit_prueba fs-6 text-info">
+        <span class="text-primary">
+            Pruebas:
+        </span>
+        <br>
+            T_LLAVE:   {{t_llave}}    <br>
+            TEMPO:     {{ tempo }}    <br>
+            UserCodec: {{codec_user}} <br>
+            email_principal:      {{email_principal}}       <br>
+    </div> -->
+
+    
+<!-- <div id="progressId" class="mt-3 p-3"> -->
+
+    <!--<div class="progressbar">
+        <label class="labForm "> Transfiriendo: </label>
+        <mat-progress-bar style="height: 15px;" mode="determinate" value="40"></mat-progress-bar>
+    </div>-->
+    <!-- <div class="progressbar">    
+        <label class="labForm "> Generando reporte: </label>
+        <mat-progress-bar style="height: 15px;"  mode="determinate" value="60"></mat-progress-bar>
+    </div> -->
+<!-- 
+</div>  -->
 
 <div class="typeTransac" cdkDrag *ngIf="tTransBool" >
-    
     <p style="font-size: 11pt; color: white; display: flex; align-items: center; justify-content: space-between;">
-
-        <mat-icon>receipt</mat-icon>Guía de transacciones:
-        
-        <mat-icon style="color: orangered; cursor: pointer;" (click)="tTransBool = !tTransBool">
-            cancel
-        </mat-icon>
-
+        <mat-icon>receipt</mat-icon>Guía de transacciones:        
+        <mat-icon style="color: orangered; cursor: pointer;" (click)="tTransBool = !tTransBool">cancel</mat-icon>
     </p>
-
     <table class="table table-warning table-hover">
         <thead class="theadTransac">
-            <th>Codigo</th>
+            <th>Código</th>
             <th>Nombre</th>
         </thead>
         <tbody>
-            <tr *ngFor="let arrs of arrTransac" (click)="gTrans(arrs.codigo + ' / ' + arrs.nombre, arrs.codigo); tTransBool = !tTransBool " >
+            <tr *ngFor  ="let arrs of arrTransac"
+                 (click)="gTrans(arrs.codigo + ' / ' + arrs.nombre, arrs.codigo); tTransBool = !tTransBool " >
                <td>{{arrs.codigo}}</td>
                <td>{{arrs.nombre}}</td>
             </tr>
@@ -50,19 +69,20 @@
 <div class="table-bodegas" id="t1"  *ngIf="boolBodegas">
     
     <div class="bodegIn">
-        <button type="button" class="btn-close m-2 mr-4" aria-label="Close" (click)="boolBodegas = !boolBodegas"></button>
-            Bodega de Ingreso: &nbsp;&nbsp; <mat-icon>chevron_right</mat-icon>
+        <button type="button"
+                class="btn-close m-2 mr-4"
+                aria-label="Close"
+                (click)="boolBodegas = !boolBodegas">
+        </button>Bodega de Ingreso: &nbsp;&nbsp;
+        <mat-icon>chevron_right</mat-icon>
     </div>
-
     <div class="headInput">
         <mat-form-field class="example-full-width" appearance="fill">
             <mat-label>Buscar por código o nombre:</mat-label>
             <input matInput [(ngModel)]="_bodser" (keyup.enter)="this.gBodegas(_bodser)" >
         </mat-form-field>
-    </div>
-    
+    </div>    
     <table class="table table-dark table-hover">
-
         <thead class="table-secondary">
             <th>Código</th>
             <th>Nombre</th>
@@ -76,18 +96,24 @@
                 <td>{{x.nombre}}</td>
             </tr>
         </tbody>
-
     </table>
-
 </div>
 
 <div class="table-bodegas" id="t2"  *ngIf="boolBodegasB" >
-    <div class="bodegInB"><button type="button" class="btn-close m-2 mr-4" aria-label="Close"  (click)="boolBodegasB = !boolBodegasB"></button>
-        Bodega de Salida: &nbsp;&nbsp; <mat-icon>chevron_left</mat-icon></div>
+    <div class="bodegInB">
+        <button type="button"
+                class="btn-close m-2 mr-4"
+                aria-label="Close"
+                (click)="boolBodegasB = !boolBodegasB">
+        </button>
+            Bodega de Salida: &nbsp;&nbsp;            
+        <mat-icon>chevron_left</mat-icon>
+    </div>
     <div class="headInput">
         <mat-form-field class="example-full-width" appearance="fill">
             <mat-label>Buscar por código o nombre:</mat-label>
-            <input matInput [(ngModel)]="_bodserB" (keyup.enter)="this.gBodegas(_bodserB)" >
+            <input matInput [(ngModel)]="_bodserB"
+                            (keyup.enter)="this.gBodegas(_bodserB)" >
         </mat-form-field>
     </div>
     <table class="table table-dark table-hover">
@@ -107,16 +133,13 @@
 </div>
 
 <div class="contGen container">
-
-   
-
-    <div class="header" id="header">
-        <div style="display: flex; flex-direction: column; width: 100%;" >
+       <div class="header" id="header">
+        <!-- <div style="display: flex; flex-direction: column; width: 100%;" >
             <div id="chartdiv" style=" width: 100%; height: 450px; background-color: darkgrey; padding: 25px;"></div>
             <button class="btn btn-warning" (click)="graphicrep()">
                 Obtener Gráfico
             </button>
-        </div>
+        </div> -->
         <div class="pSet">
 
             <mat-form-field class="mat example-full-width" appearance="fill" (click)="tTransBool = !tTransBool">
@@ -126,13 +149,22 @@
 
             <mat-form-field class="mat example-full-width" appearance="fill">
                 <mat-label>Número de Comprobante:</mat-label>
-                <input matInput placeholder="00000000" value="00000000" (keyup.enter)="getReport()">
+                <input matInput
+                       placeholder="00000000"
+                       [(ngModel)]="_valueComprobante"    
+                       (click)="limpiarComprob()"                  
+                       (keyup.enter)="getReport()">
+                       
             </mat-form-field>
 
             <mat-form-field class="mat example-full-width" appearance="fill">
                 <mat-label>Fecha:</mat-label>
-                <input matInput disabled placeholder="" value="{{_fechaAct | date: 'MM/dd/yyyy'}}">
-                <span class="note" style="color: tomato; font-size: 9pt;"> mes/día/año </span>
+                <input matInput disabled placeholder=""
+                 value="{{_fechaAct | date: 'MM/dd/yyyy'}}">
+                <span class="note"
+                      style="color: tomato; font-size: 9pt;">
+                      mes/día/año
+                </span>
             </mat-form-field>
 
         </div>
@@ -164,7 +196,11 @@
     
     <div class="btnSets" style="display: flex; justify-content: stretch;">
 
-        <button class=" nbtn btn btn-warning" (click)="comprobateBodega()" > 
+        <button class=" nbtn btn btn-warning" (click)="cleanAll()" > 
+            <mat-icon> auto_awesome </mat-icon> Limpiar
+        </button>
+
+        <button class=" nbtn btn btn-primary" (click)="comprobateBodega()" > 
             <mat-icon> fact_check </mat-icon> Nuevo
         </button>
 
@@ -300,15 +336,19 @@
 </div>
 
 <div class="repo" *ngIf="repoBool">
-    
-    <section style="text-align: center;"> 
+    <div id="disRepo" >
+    <div class="btnsets w-100 d-flex justify-content-end" >
+        <button type="button" class="btn-close " (click)="repoBool = !repoBool" aria-label="Close"></button>
+    </div>
+    <div id="bodeInfoRepo">
+    <section style="text-align: center; font-family: arial;"> 
         <h2>
             <hr>
-                <div class="transBode">
+                <div class="transBode" >
                     <strong>TRANSFERENCIA DE BODEGAS</strong> 
                     <h4>
                         <strong>                       
-                            <span class="text text-danger" style="font-size: 27pt;">
+                            <span class="text text-danger" style="font-size: 27pt; color: red;">
                                 {{_tipoTran}} {{_numero}}
                             </span>
                         </strong>
@@ -317,48 +357,39 @@
             <hr>
         </h2>
     </section>
-    <div class="header">
-
+    <div class="header" style="font-family: arial; ">
         <div class="head">
             <div> Bodega de destino: &nbsp; <strong>  {{bod_desti}}                 </strong> </div>
             <div> Fecha de emisión:  &nbsp; <strong>  {{fech_emi | date: 'medium'}} </strong> </div>
             <div> Observación:       &nbsp; <strong>  {{_observerrep}}              </strong> </div>
             <div> Bodega de origen:  &nbsp; <strong>  {{bod_ori}}                   </strong> </div>
         </div>
-
         <div class="head">
             <div> Fecha de Transacción:  &nbsp; <strong> {{fech_tran | date: 'medium' }} </strong> </div>
             <div> Cod.Usuario:           &nbsp; <strong> {{us_cla}}                      </strong> </div>
         </div>
-
     </div>
-
-    <div class="bodyrep">
-
-        <table class="table table-warning">
-            <thead class="table-info">
+    <div class="bodyrep" style="width: 100%; margin-top: 25px;">
+        <table class="table table-warning" style="width: 100%;">
+            <thead class="table-info" style="font-family: arial; background-color: black; color: white;">
                 <th>Producto</th>
                 <th>Descripción del Producto</th>
-                <!-- <th>Cod. Int.</th> -->
                 <th>Presenta</th>
                 <th>Cantidad</th>
             </thead>
 
-            <tbody>
+            <tbody id="tbodyRequest">
                 <tr *ngFor="let jk of repoArr">
-                    <td><strong> {{jk.no_parte}} </strong></td>
-                    <td><strong> {{jk.des_noparte}} </strong></td>
-                    <!-- <td></td> -->
-                    <td><strong> {{jk.presenta}} </strong></td>
-                    <td><strong> {{jk.cantidad}} </strong></td>
+                    <td style="font-family: arial;"><strong> {{jk.no_parte}} </strong></td>
+                    <td style="font-family: arial;"><strong> {{jk.des_noparte}} </strong></td>
+                    <td style="font-family: arial;"><strong> {{jk.desunidad}} </strong></td>
+                    <td style="font-family: arial;"><strong> {{jk.cantidad}} </strong></td>
                 </tr>
             </tbody>
-
         </table>
-
     </div>
 
-    <div class="footerRep">
+    <div class="footerRep" style="display: flex; font-family: arial; justify-content: space-around;">
         <div style="display: flex; flex-direction: column; text-align: center; width: 145px; margin-top: 100px;">
             <strong>
                 ___________________
@@ -384,6 +415,12 @@
         </div>
     </div>
 
+    <button class="btn-info" (click)="imprSelec('disRepo')" style="font-family: arial; margin-top: 15px;" >
+        Imprimir
+    </button>
+    
+    </div>
+</div>
 </div>
 
 

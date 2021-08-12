@@ -68,7 +68,7 @@ export class ReporteComponent implements OnInit {
           //   this._ruc       = this.arrCursor[i][0].ruc;
           //   this._telefono  = this.arrCursor[i][0].fono1;
           //   this._emision   = this.arrCursor[i][0].fechA_TRA;
-          //   this._f_vencimiento   = this.arrCursor[i][0].fecha_ven;            
+          //   this._f_vencimiento   = this.arrCursor[i][0].fecha_ven;          
           //   //---------------------------------------------------------------
           //   //bucle para recorrer el detalle
           //   for(let f = 0; f <= this.arrCursor[i].length; f++) {              

@@ -6,6 +6,9 @@ import { TInvcabgControllerService } from '../services/t-invcabg-controller.serv
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+import { ZfillService } from '../services/zfill.service';
+import { HttpEventType, HttpResponse } from '@angular/common/http';
+// import {  Progress, ProgressLabel, CircularProgress, CircularProgressLabel } from "@chakra-ui/progress";
 
 @Component({
   selector: 'app-transferenciabod',
@@ -13,9 +16,21 @@ import am4themes_animated from "@amcharts/amcharts4/themes/animated";
   styleUrls: ['./transferenciabod.component.styl']
 })
 export class TransferenciabodComponent implements OnInit {
+  
+  //#region 
+    //pruebas de almacenamiento INICIO
+    public t_llave;
+    public tempo;
+    public codec_user;
+    public user;
+    public session_tipo;
+    public email_principal;
+    //pruebas de almacenamiento FIN
+  //#endregion
 
-  constructor( public gb: TransferbodService, public route: Router, public report: TInvcabgControllerService ) { }
-
+  constructor( public gb: TransferbodService, public route: Router, public report: TInvcabgControllerService, public zfi: ZfillService ) { }
+    
+  public _valueComprobante: any = 0;
   public repoBool: boolean = false;
   public _tipoCosto = 'PROM';
   public _observ: string;
@@ -58,12 +73,16 @@ export class TransferenciabodComponent implements OnInit {
   public codTransac: string;
   
   ngOnInit() {
+    this.t_llave    = sessionStorage.getItem('Session-Key');
+    this.codec_user = sessionStorage.getItem('codec_user');
+    this.email_principal= sessionStorage.getItem('email_principal');
+    
+    
     this.gBodegas('0');
     this.getTransacs();
+    //this._valueComprobante = this.zfi.zfill(0,8);
     sessionStorage.setItem('tipo_costo', this._tipoCosto);
     this._fechaAct.toString().slice(0,8);
-
-  
   }
 
   
@@ -79,6 +98,7 @@ export class TransferenciabodComponent implements OnInit {
   public _numero;
   public _tipoTran;
 
+ 
   transferir(a) {
 
     console.log(a);
@@ -95,6 +115,9 @@ export class TransferenciabodComponent implements OnInit {
       comenta   : a
     }
 
+    this.t_llave = sessionStorage.getItem('Session-Key');
+    this.tempo = 'transferencia';
+
     console.log(modelCab);
     
     if( this.cantSprod <= 0 ) {
@@ -104,19 +127,18 @@ export class TransferenciabodComponent implements OnInit {
         text: 'Necesitas por lo menos un producto ingresado en el detalle.',
       })
     }
-    else {
-      this._bodserB     = '';
-      this._cod         = '';
-      this._desc        = '';
-      this._pres        = '';
-      this._cnti        = '';
 
+    else {
+      this._bodserB       = '';
+      this._cod           = '';
+      this._desc          = '';
+      this._pres          = '';
+      this._cnti          = '';
       this._boolTableShow = false;
       this.boolBodOri     = true;
       this._bodserBool    = false;
 
       this.gpbod( '0', this.modifyDate() )
-
       this.gb.saveCab(modelCab).subscribe( () => {
         
         Swal.fire({
@@ -150,12 +172,13 @@ export class TransferenciabodComponent implements OnInit {
       console.log(sessionStorage.getItem('Session-Key'))      
       this.reporteria();
     }
+    
   }
+
 
   public ArrSP_GRAFICAWEB: any = [];
   public bodegaGraph;
   public stock;
-
   graphicrep() {
     am4core.useTheme(am4themes_animated);
     let idchart = document.getElementById('chartdiv');
@@ -231,7 +254,6 @@ export class TransferenciabodComponent implements OnInit {
     series.columns.template.tooltipText   = "Stock: {valueY.value}";
     series.columns.template.tooltipY      = 0;
     series.columns.template.strokeOpacity = 0;
-
     // as by default columns of the same series are of the same color, we add adapter which takes colors from chart.colors color set
     series.columns.template.adapter.add("fill", (fill, target) => {
       return chart.colors.getIndex(target.dataItem.index);
@@ -239,37 +261,68 @@ export class TransferenciabodComponent implements OnInit {
 
   }
 
+  public valu: number;
+  //#region  "Update function()"
+  public upload;
+  public uploadTotal;
+  public porcentUploadTotal;
+  public arrGrgen;
+  public btnImp: boolean = true;
+  getReports(obj_sliA, obj_sliB) {
+    this.report.getExecReport(obj_sliA, obj_sliB)
+               .subscribe( myreport => {
 
+      this.repoArr      = myreport;
+      this.repoBool     = true;
+      this.bod_ori      = this.repoArr[0].bodega   + ' / ' + this.repoArr[0].bnombre;
+      this.bod_desti    = this.repoArr[0].bodega_d + ' / ' + this.repoArr[0].bnombreD;
+      this.fech_emi     = new Date();
+      this.us_cla       = this.repoArr[0].usercla;
+      this._observerrep = this.repoArr[0].comenta;
+      this._numero      = this.repoArr[0].numero2;
+      this._tipoTran    = this.repoArr[0].tipo;
+      this.fech_tran    = this.repoArr[0].fecha_tra;
+      console.log(this.repoArr);
+
+    }, () => {
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        html: `Número de comprobante no existe / <strong> COD.: ${sessionStorage.getItem('tipos-trans')} - ${this._valueComprobante} </strong>`,
+      })
+
+    })
+  }
+ public counts;
   reporteria() {
-    let sliA, sliB;
-      
+    let sliA, sliB;      
     setTimeout(() => {
-      this.gb.exec( sessionStorage.getItem('Session-Key'), 'transferencia' ).subscribe( CODREPORT => {
+      this.gb.exec( sessionStorage.getItem('Session-Key'), 'transferencia' )
+                                  .subscribe( CODREPORT => {
         this.comproba = CODREPORT[0].comproba;
         sliA = this.comproba.slice(0,-8);
         sliB = this.comproba.slice(2,10);
+        console.log(sliA, sliB);
       })
     }, 1000);
-        
-    setTimeout( () => {      
-      this.report.getExecReport(sliA, sliB).subscribe( myreport =>{
-        this.repoArr = myreport;
-        this.repoBool = true;
-        console.log(this.repoArr),
-        this.bod_ori      = this.repoArr[0].bodega   + ' / ' + this.repoArr[0].bnombre;
-        this.bod_desti    = this.repoArr[0].bodega_d + ' / ' + this.repoArr[0].bnombreD;
-        this.fech_emi     = new Date();
-        this.us_cla       = this.repoArr[0].usercla;
-        this._observerrep = this.repoArr[0].comenta;
-        this._numero      = this.repoArr[0].numero2;
-        this._tipoTran    = this.repoArr[0].tipo;
-        this.fech_tran    = this.repoArr[0].fecha_tra;
-      })
-    }, 2000)
+    setTimeout(() => {
+      this.getReports(sliA, sliB);
+    }, 2500 )
   }
 
+  
+  imprSelec(a) {
+    var ficha = document.getElementById(a);
+    ficha.style.fontFamily = 'arial';
+	  let ventimp = window.open(' ', 'popimpr');    
+	  ventimp.document.write( ficha.innerHTML);
+	  ventimp.document.close();
+    ventimp.print();    
+    ventimp.close();
+	}
 
-  saveDetalle(modelDetail) {   
+  saveDetalle(modelDetail) {
       this.gb.saveDet(modelDetail).subscribe( () => {
         this.getTransProd();
       }, () => {
@@ -277,26 +330,28 @@ export class TransferenciabodComponent implements OnInit {
       })
   }
 
-
   getTransacs() {
-
     this.gb.getTransacProd().subscribe( TRANS => {
       this.arrTransac = TRANS ;
       console.log(TRANS);
     })
-
   }
 
   gTrans(a, b) {
-
     this._transaccion = a;
     this.codTransac = b;
     sessionStorage.setItem('tipos-trans', this.codTransac);
-
+    console.log(a + ' - ' + b);
+    //sessionStorage.setItem('codec-trans', )
+    //this.getReports(a,b);
   }
 
+
+
+
   gBodegas(filter) {
-    this.gb.getBodegas(filter).subscribe( bodegas => {
+    this.gb.getBodegas(filter)
+           .subscribe(bodegas => {
       this.arrBodegas = bodegas;
     })
   }
@@ -323,18 +378,15 @@ export class TransferenciabodComponent implements OnInit {
     if( localStorage.getItem('BodegaIngreso') != localStorage.getItem('BodegaSalida') ) {
       return
     }
+
     else {
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
         text: 'No puedes seleccionar las mismas bodegas al mismo tiempo',
       })
-
       this._bodser  = '------';
       this._bodserB = '------';
-
-
-
     }
   }
 
@@ -410,29 +462,44 @@ export class TransferenciabodComponent implements OnInit {
     }
   }
 
-  getReport() {
-    this.reporteria()
+  limpiarComprob() {
+    this._valueComprobante = '';
+  }
+
+  cleanAll() {
+    this._bodser           =  '';
+    this._bodserB          =  '';
+    this._observ           =  '';
+    this._valueComprobante =  '';
+    this._transaccion      =  '';
+  }
+
+  getReport() {  
+    this.getReports(sessionStorage.getItem('tipos-trans'), this.zfi.zfill(this._valueComprobante, 8));
+    this._valueComprobante = this.zfi.zfill(this._valueComprobante, 8)
+    this.cleanAll();
+  }
+
+  fillZero(a) {
+    this._valueComprobante = this.zfi.zfill(a, 8);
+    console.log(this.zfi.zfill( a, 8 ));
   }
 
   upProduct(a, b, c ,d) {
-    
     if( d <= 0 ) {
       Swal.fire({
         icon: 'info', title: 'Oops..!', text: 'No puedes escojer un producto sin stock'
       })
     }
     else {
-
       localStorage.setItem('no_parte-trans',      a);
       localStorage.setItem('nombre-trans',        b);
       localStorage.setItem('presentacion-trans',  c);
       localStorage.setItem('stock-trans',         d);
-
       this._cod   = a;
       this._desc  = b;
       this._pres  = c;
       this._STCK = localStorage.getItem('stock-trans');
-      //this._cant  = d;
     }
   }
 

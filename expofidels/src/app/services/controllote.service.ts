@@ -21,15 +21,14 @@ export class ControlloteService {
       return this.http.get( this.apiURL + '/products/getLoteimg/' + nparte );
     }
 
-    // http://localhost:5000/api/products/estadoLote/T/EM/00000001
     updateEstate(estadolote, tipo, numero) {
       return this.http.get( this.apiURL + '/products/estadoLote/' + estadolote + '/' + tipo + '/' + numero )
     }
-
+    
     getloteFilterExec(filter,  opts) {
       return this.http.get( this.apiURL + '/products/getLoteFilter/' + filter + '/'  +  opts );
     }
-
+    
     getloteFilterNProd(filter, noparte) {
       return this.http.get( this.apiURL + '/products/getLoteCodNpart/' + filter + '/' + noparte );
     }
